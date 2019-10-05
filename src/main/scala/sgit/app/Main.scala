@@ -3,6 +3,7 @@ package sgit.app
 import scopt.OParser
 import sgit.app.commandlineParser._
 import scala.util.matching.Regex
+import sgit.createRepo._
 
 object Main extends App {
 
@@ -21,7 +22,7 @@ object Main extends App {
    */
   def determineMode(command: String, option: String, files: Seq[String]): Unit = {
     command match {
-      case "init" => println("Init")
+      case "init" => InitCommand.createTreeView()
       case "status" => println("status")
       case "diff" => println("diff")
       case "add" => addTypeArg (files)
