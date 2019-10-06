@@ -1,7 +1,7 @@
 package sgit.createRepo
 
-import sgit.io.createRepository
-import sgit.io.writeFile
+import sgit.io.CreateRepository
+import sgit.io.WriteFile
 
 object InitCommand {
 
@@ -9,12 +9,11 @@ object InitCommand {
    * Create and initialise the .sgit repository into the current folder.
    */
   def createTreeView() = {
-    val status = createRepository.initialisation()
+    val status = CreateRepository.initialisation()
     if (status) {
-      writeFile.writeHead("master")
+      WriteFile.writeHead("master")
       println("The repository is created.")
     }
-    else println("The repository was already created.")
-
+    else println("An error as occurred. Please try again.")
   }
 }

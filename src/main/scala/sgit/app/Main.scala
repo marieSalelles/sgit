@@ -2,8 +2,9 @@ package sgit.app
 
 import scopt.OParser
 import sgit.app.commandlineParser._
-import scala.util.matching.Regex
+
 import sgit.createRepo._
+import sgit.localChangeRepo._
 
 object Main extends App {
 
@@ -25,7 +26,7 @@ object Main extends App {
       case "init" => InitCommand.createTreeView()
       case "status" => println("status")
       case "diff" => println("diff")
-      case "add" => addTypeArg (files)
+      case "add" => AddCommand.addAccordingTypeArg(files)
       case _=> println("Error, write a good command 2")
     }
   }
@@ -34,21 +35,5 @@ object Main extends App {
 
   }*/
 
-  /**
-   * Check the argument type of add command
-   * @param files : sequence of string which can be a dot, a regex or filenames
-   */
-  def addTypeArg(files :Seq[String]): Unit = {
-      if(files.nonEmpty) {
-        if (files.head == ".") println("add all docs.")
-        else {
-          val regexFilename: Regex = "^[a-zA-Z0-9_]+\\.[A-Za-z]*$".r
-          regexFilename.matches(files.head) match {
-            case true => println("file.")
-            case false => println("regex")
-          }
-        }
-      } else println("enter an argument after the add command.")
 
-  }
 }

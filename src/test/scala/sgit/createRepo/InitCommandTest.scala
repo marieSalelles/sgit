@@ -4,7 +4,7 @@ import org.scalatest._
 import java.nio.file.{Files, Paths}
 import better.files._
 
-import sgit.io.createRepository
+import sgit.io.CreateRepository
 
 class InitCommandTest extends FunSpec {
 
@@ -21,8 +21,8 @@ class InitCommandTest extends FunSpec {
       if (Files.exists(Paths.get(".sgit")))  ".sgit".toFile.delete()
     }
     it("Or if the directory already exist, nothing is done.") {
-      createRepository.initialisation()
-      assert (!createRepository.initialisation())
+      CreateRepository.initialisation()
+      assert (!CreateRepository.initialisation())
       ".sgit".toFile.delete()
     }
   }
