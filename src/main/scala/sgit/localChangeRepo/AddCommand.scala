@@ -1,7 +1,7 @@
 package sgit.localChangeRepo
 
 import better.files.File
-import sgit.io.{CreateFile, RepoSearching, WriteFile}
+import sgit.io.{CreateFile, RepoSearching, StateFileDefining, WriteFile}
 
 import scala.util.matching.Regex
 
@@ -19,10 +19,11 @@ object AddCommand {
         WriteFile.writeStaged(blobs)
       }
       else {
-        val regexFilename: Regex = "^[a-zA-Z0-9_]+\\.[A-Za-z]*$".r
+        val regexFilename: Regex = "^[a-zA-Z0-9_/]+\\.[A-Za-z]*$".r
         if (regexFilename.matches(files.head)) {
           val retrievesFiles: Seq[File] = RepoSearching.searchDirectoryFile(files)
           val blobs = CreateFile.createObjectBlob(retrievesFiles)
+          //StateFileDefining.modifiedFileStaged(blobs)
           WriteFile.writeStaged(blobs)
         } else {
           val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head.r)

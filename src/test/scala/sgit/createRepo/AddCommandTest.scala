@@ -19,12 +19,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       .createIfNotExists()
   }
   after {
-    val children = ".sgit/objects".toFile.children.toSeq
-    children.map(c => c.delete())
-    ".sgit/staged".toFile.delete()
-      val dir: File = ".sgit/staged"
-        .toFile
-        .createIfNotExists(false,false)
+    ".sgit/".toFile.delete()
     ".sgit/".toFile.parent + "/" + "READMES.md".toFile.delete()
     ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
   }
