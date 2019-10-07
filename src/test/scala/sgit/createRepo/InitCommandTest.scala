@@ -6,8 +6,11 @@ import better.files._
 
 import sgit.io.CreateRepository
 
-class InitCommandTest extends FunSpec {
+class InitCommandTest extends FunSpec with BeforeAndAfter {
 
+  after {
+    ".sgit".toFile.delete()
+  }
   describe("If the user write the command sgit init in a directory") {
     it("A folder with a tree view should be created in the directory.") {
       InitCommand.createTreeView()
@@ -18,12 +21,10 @@ class InitCommandTest extends FunSpec {
       assert(Files.exists(Paths.get(".sgit/refs")))
       assert(Files.exists(Paths.get((".sgit/refs/heads"))))
       assert(Files.exists(Paths.get(".sgit/refs/tags")))
-      if (Files.exists(Paths.get(".sgit")))  ".sgit".toFile.delete()
     }
     it("Or if the directory already exist, nothing is done.") {
       CreateRepository.initialisation()
       assert (!CreateRepository.initialisation())
-      ".sgit".toFile.delete()
     }
   }
 
