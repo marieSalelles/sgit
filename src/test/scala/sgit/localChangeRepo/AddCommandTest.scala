@@ -5,6 +5,7 @@ import org.scalatest._
 import sgit.createRepo.InitCommand
 import sgit.io._
 import sgit.localChangeRepo.AddCommand
+import sgit.objects.{Blob, StagedLine}
 
 class AddCommandTest extends FunSpec with BeforeAndAfter {
   before {
@@ -32,21 +33,21 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       val fileInUserRepo = RepoSearching.searchDirectoryFile("[A-Za-z]*R[a-zA-Z]*.[a-z]*".r)
       val files = fileInUserRepo.filterNot(f => f.isDirectory)
       //generate sha key to files
-      val shakeys = files.map(f => f.sha1)
+      val shakeys = files.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
       //retrieve the sha key in the file staged
       val contentFile = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
       assert(contentFile == shakeys)
 
     }
     it("The file(s) corresponding the the name(s) given in by the user is/are added into the staged file."){
-      val files :Seq[String] = Seq("README.md", "build.sbt")
+      val files :Seq[String] = Seq("READMES.md", "READMEBIS.md")
       AddCommand.addAccordingTypeArg(files)
 
       //search the file corresponding to the regex in the user repo
       val foundFile = RepoSearching.searchDirectoryFile(files)
       //generate sha key to files
       val files2 = foundFile.filterNot(f => f.isDirectory)
-      val shakeys = files2.map(f => f.sha1)
+      val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
       //retrieve the sha key in the file staged
       val contentFile = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
       assert(contentFile == shakeys)
@@ -58,7 +59,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       val files = RepoSearching.searchAllDirectoryFile()
       //generate sha key to files
       val files2 = files.filterNot(f => f.isDirectory)
-      val shakeys = files2.map(f => f.sha1)
+      val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
       //retrieve the sha key in the file staged
       val contentFile = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
       assert(contentFile == shakeys)

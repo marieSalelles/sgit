@@ -8,7 +8,7 @@ object InitCommand {
   /**
    * Create and initialise the .sgit repository into the current folder.
    */
-  def createTreeView() = {
+  def createTreeView() :Unit = {
     val status = CreateRepository.initialisation()
     if (status) {
       WriteFile.writeHead("master")

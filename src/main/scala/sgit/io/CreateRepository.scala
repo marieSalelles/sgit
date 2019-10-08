@@ -9,7 +9,7 @@ object CreateRepository {
    * Create the tree view of the sgit repository if .sgit not already exist.
    * @return the state of the repository creation
    */
-  def initialisation() ={
+  def initialisation() :Boolean ={
     try {
       if (!Files.exists(Paths.get(".sgit"))) {
         createDirectory(true, ".sgit")

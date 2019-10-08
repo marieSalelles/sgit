@@ -1,11 +1,20 @@
 package sgit.io
 
+import java.nio.file.{Files, Paths}
+
 import sgit.objects.{Blob, StagedLine}
 
-object StateFileDefining {
+object StagedUpdating {
 
-  def updateStagedFile (files : Seq[Blob]) = {
-    val fileToAdd = fileAlreadyStaged(files)
+  /**
+   * Update the current state of the staged file
+   * @param files : the files which are currently added
+   * @return : the files to add
+   */
+  def updateStagedFile (files : Seq[Blob]):Seq[Blob] = {
+    val fileToAdd :Seq[Blob] = fileAlreadyStaged(files)
+    //update the state of the staged file
+    removeFileInStaged()
     removeOldFileVersion(fileToAdd)
     fileToAdd
   }
@@ -13,9 +22,8 @@ object StateFileDefining {
   /**
    * Search if the file added by the user are not already added to the staged in the older version.
    * @param files : files currently added
-   * @return : the older version of a file added
    */
-  def removeOldFileVersion (files : Seq[Blob]) = {
+  def removeOldFileVersion (files : Seq[Blob]):Unit = {
     //retrieve he file store in the staged file
     val stagedFiles :Option[Seq[StagedLine]]= ReadFile.readStaged()
 
@@ -40,21 +48,24 @@ object StateFileDefining {
    * @param files :file thatt the user would like add
    * @return : the files to add in the staged file
    */
-  def fileAlreadyStaged(files :Seq[Blob]) = {
+  def fileAlreadyStaged(files :Seq[Blob]) :Seq[Blob] = {
+    //retrieve the files store in the staged file
     val stagedFiles: Option[List[StagedLine]] = ReadFile.readStaged()
     if (stagedFiles.isDefined) {
-      val stagedFilesSha = stagedFiles.get.map((sl :StagedLine) => sl.sha)
+      //retrieve the sha key of the staged file
+      val stagedFilesSha :Seq[String]= stagedFiles.get.map((sl :StagedLine) => sl.sha)
       files.filterNot(f => stagedFilesSha.contains(f.sha))
     } else files
   }
 
   /**
    * Search if a file in the staged file is deleted in the user repository
-   * @return :the sequence of file which are  in the user repo
    */
- /* def updateFileStaged() = {
-    val stagedFiles =  ReadFile.readStaged()
-    val stagedFileNames: Seq[String] = stagedFiles.map((f: String) => ReadFile.readName(f))
-    stagedFileNames.filter( f => Files.exists(Paths.get(f)))
-  }*/
+  def removeFileInStaged() :Unit = {
+    val stagedFiles :Option[Seq[StagedLine]] =  ReadFile.readStaged()
+    if (stagedFiles.isDefined) {
+      val fileStillPresent :Seq[StagedLine] = stagedFiles.get.filter( blob => Files.exists(Paths.get(blob.path)))
+      WriteFile.rewriteStaged(fileStillPresent)
+    }
+  }
 }

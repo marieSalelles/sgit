@@ -12,7 +12,7 @@ object CreateFile {
    * @param files : files lists
    * @return : sequence of sha keys
    */
-  def createObjectBlob(files :Seq[File]) = {
+  def createObjectBlob(files :Seq[File]) :Seq[Blob] = {
     val root = ".sgit/".toFile.parent
     files.map((file :File) => {
       val path = Paths.get(".sgit/objects/")

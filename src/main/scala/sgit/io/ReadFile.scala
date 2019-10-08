@@ -15,7 +15,7 @@ object ReadFile {
   def readName(f :String) :String= {
     val currentFolder = (".sgit/objects/"+ f)
     if (Files.exists(Paths.get(currentFolder)) && f != "") {
-      val content = currentFolder.toFile.contentAsString
+      val content :String = currentFolder.toFile.contentAsString
       content.substring(0, content.indexOf('\n'))
     } else ""
   }
@@ -25,7 +25,7 @@ object ReadFile {
    * @return : the list of the added files.
    */
   def readStaged() :Option[List[StagedLine]]  = {
-    val line = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
+    val line :List[String] = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
     if (line != List("")) {
       Some(line.map(l => {
         val ids = l.split(" ")
