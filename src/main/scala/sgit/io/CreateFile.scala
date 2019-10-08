@@ -1,7 +1,9 @@
 package sgit.io
 
 import java.nio.file.Paths
+
 import better.files._
+import sgit.objects.Blob
 
 object CreateFile {
 
@@ -16,10 +18,9 @@ object CreateFile {
       val path = Paths.get(".sgit/objects/")
       val _: File=  (path + "/" + file.sha1)
         .toFile
-        .createIfNotExists()
-        .appendLine(root.relativize(file).toString)
+         .appendLine(root.relativize(file).toString)
         .appendText(file.contentAsString)
-      file.sha1
+      Blob(file.sha1,file.contentAsString, root.relativize(file).toString)
     })
   }
 

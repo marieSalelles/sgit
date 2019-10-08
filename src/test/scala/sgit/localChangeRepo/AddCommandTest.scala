@@ -1,11 +1,10 @@
-package sgit.createRepo
+package sgit.localChangeRepo
 
-import org.scalatest._
-import java.nio.file.{Files, Paths}
 import better.files._
-import sgit.localChangeRepo.AddCommand
-
+import org.scalatest._
+import sgit.createRepo.InitCommand
 import sgit.io._
+import sgit.localChangeRepo.AddCommand
 
 class AddCommandTest extends FunSpec with BeforeAndAfter {
   before {

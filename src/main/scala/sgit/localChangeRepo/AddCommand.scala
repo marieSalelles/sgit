@@ -2,6 +2,7 @@ package sgit.localChangeRepo
 
 import better.files.File
 import sgit.io.{CreateFile, RepoSearching, StateFileDefining, WriteFile}
+import sgit.objects.Blob
 
 import scala.util.matching.Regex
 
@@ -14,21 +15,29 @@ object AddCommand {
   def addAccordingTypeArg(files :Seq[String]): Unit = {
     if(files.nonEmpty) {
       if (files.head == ".") {
+        //Search file in the user repo
         val retrieveFiles :Seq[File]= RepoSearching.searchAllDirectoryFile()
-        val blobs :Seq[String]= CreateFile.createObjectBlob(retrieveFiles.filterNot(f => f.isDirectory))
-        WriteFile.writeStaged(blobs)
+        //Create files in objects directory
+        val blobs :Seq[Blob]= CreateFile.createObjectBlob(retrieveFiles.filterNot(f => f.isDirectory))
+        //write the staged file
+        WriteFile.writeStaged(StateFileDefining.updateStagedFile(blobs))
       }
       else {
         val regexFilename: Regex = "^[a-zA-Z0-9_/]+\\.[A-Za-z]*$".r
         if (regexFilename.matches(files.head)) {
+          //Search file in the user repo
           val retrievesFiles: Seq[File] = RepoSearching.searchDirectoryFile(files)
+          //Create files in objects directory
           val blobs = CreateFile.createObjectBlob(retrievesFiles)
-          //StateFileDefining.modifiedFileStaged(blobs)
-          WriteFile.writeStaged(blobs)
+          //write the staged file
+          WriteFile.writeStaged(StateFileDefining.updateStagedFile(blobs))
         } else {
+          //Search file in the user repo
           val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head.r)
-          val blobs: Seq[String] = CreateFile.createObjectBlob(retrieveFiles.filterNot(f => f.isDirectory))
-          WriteFile.writeStaged(blobs)
+          //Create files in objects directory
+          val blobs: Seq[Blob] = CreateFile.createObjectBlob(retrieveFiles.filterNot(f => f.isDirectory))
+          //write the staged file
+          WriteFile.writeStaged(StateFileDefining.updateStagedFile(blobs))
           //retrieveFiles.filter(f => f.isDirectory)
         }
       }
