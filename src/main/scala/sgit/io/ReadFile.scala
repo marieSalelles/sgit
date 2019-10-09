@@ -25,7 +25,9 @@ object ReadFile {
    * @return : the list of the added files.
    */
   def readStaged() :Option[List[StagedLine]]  = {
-    val line :List[String] = ".sgit/staged".toFile.contentAsString.split("\r\n").toList
+    val line :List[String] = ".sgit/staged".toFile.contentAsString
+      .replace("\r", "")
+      .split("\n").toList
     if (line != List("")) {
       Some(line.map(l => {
         val ids = l.split(" ")

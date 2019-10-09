@@ -9,7 +9,7 @@ import sgit.io.CreateRepository
 class InitCommandTest extends FunSpec with BeforeAndAfter {
 
   after {
-    ".sgit".toFile.delete()
+    if(Files.exists(Paths.get(".sgit"))) ".sgit".toFile.delete()
   }
   describe("If the user write the command sgit init in a directory") {
     it("A folder with a tree view should be created in the directory.") {

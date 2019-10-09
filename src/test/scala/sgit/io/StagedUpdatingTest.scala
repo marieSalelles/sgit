@@ -21,16 +21,16 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
       .appendLine("* Test")
   }
   after {
-    ".sgit/".toFile.delete()
-    ".sgit/".toFile.parent + "/" + "READMES.md".toFile.delete()
-    if (Files.exists(Paths.get("READMEBIS.md"))) {
+    if("READMES.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMES.md".toFile.delete()
+    if("READMEBIS.md".toFile.exists) {
       ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
     }
+    if(".sgit/".toFile.exists) ".sgit/".toFile.delete()
   }
 
-  describe("If the user have already added file and try to re add file without commit (the staged file have a content)") {
-    describe("The file that the user would like to add are compare to the files in the staged.") {
-      it(" If there is the same file it is not rewrite on the staged file.") {
+  describe("If the user has already added files and try to re add files without commit (the staged file has a content)") {
+    describe("The files that the user would like to add are compared to the files in the staged.") {
+      it("should not add a file that is already in the staged file.") {
         val file = "READMEBIS.md"
         AddCommand.addAccordingTypeArg(List(file))
         //build the expected value
@@ -42,7 +42,7 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
         val stagedFile = stagedContent.get.map(f => f)
         assert(stagedFile.head == expectedFileStaged)
       }
-      it("If a new version of a file is added the older one is delete of the staged file and the new is added to this.") {
+      it("should delete the old version of a file in the staged file.") {
         val file = "READMEBIS.md"
         AddCommand.addAccordingTypeArg(List(file))
         ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.appendLine("#It is a test.")
@@ -54,7 +54,7 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
         val stagedFile = stagedContent.get.map(f => f)
         assert(stagedFile.head == expectedFileStaged)
       }
-      it("If a file in the staged file is deleted by the user in his repository, the line which refers to this file in the staged file is deleted"){
+      it("should delete a file that is not in the user repo in the staged file."){
         val file = "READMEBIS.md"
         val file2 = "READMES.md"
         AddCommand.addAccordingTypeArg(List(file))

@@ -1,5 +1,5 @@
 # sgit
-Development of git to scala. Realization of the following functionalities: 
+Development of git in scala. Realization of the following functionalities: 
 * git init
 * git status 
 * git diff
