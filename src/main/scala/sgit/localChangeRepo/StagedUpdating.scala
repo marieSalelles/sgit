@@ -1,7 +1,8 @@
-package sgit.io
+package sgit.localChangeRepo
 
 import java.nio.file.{Files, Paths}
 
+import sgit.io.{ReadFile, WriteFile}
 import sgit.objects.{Blob, StagedLine}
 
 object StagedUpdating {
