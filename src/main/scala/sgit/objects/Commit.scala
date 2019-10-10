@@ -1,6 +1,6 @@
 package sgit.objects
 
-import java.sql.Date
+import java.time.Instant
 
-case class Commit (sha: String, timestamp: Date, message: String, parents: Seq[String], tree: Tree) {
+case class Commit (sha: String, timestamp: Instant, parents: Seq[String], files: Seq[StagedLine]) {
 }

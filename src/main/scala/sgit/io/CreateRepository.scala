@@ -16,8 +16,8 @@ object CreateRepository {
         createDirectory(false, ".sgit/HEAD")
         createDirectory(true, ".sgit/objects")
         createDirectory(true, ".sgit/refs")
-        createDirectory(false, ".sgit/refs/heads")
-        createDirectory(false, ".sgit/refs/tags")
+        createDirectory(true, ".sgit/refs/heads")
+        createDirectory(true, ".sgit/refs/tags")
         createDirectory(false, ".sgit/staged")
         true
       } else {

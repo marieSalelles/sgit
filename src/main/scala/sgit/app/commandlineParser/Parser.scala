@@ -27,6 +27,9 @@ object Parser {
             .action((x, c) => c.copy(files = c.files :+ x))
             .text("Several File(s) or a regex.")
         ),
+      cmd("commit")
+          .action((_,c) => c.copy(command = "commit"))
+          .text("Record changes to the repository."),
         checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")

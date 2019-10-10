@@ -3,7 +3,7 @@ package sgit.io
 import java.nio.file.{Files, Paths}
 
 import better.files._
-import sgit.objects.StagedLine
+import sgit.objects.{Commit, StagedLine}
 
 object ReadFile {
 
@@ -22,7 +22,7 @@ object ReadFile {
 
   /**
    * Read the content of the stages file.
-   * @return : the list of the added files.
+   * @return the list of the added files.
    */
   def readStaged() :Option[List[StagedLine]]  = {
     val line :List[String] = ".sgit/staged".toFile.contentAsString
@@ -33,6 +33,57 @@ object ReadFile {
         val ids = l.split(" ")
        StagedLine(ids(0), ids(1))
       }))
+    } else None
+  }
+
+  /**
+   * Read the content of a commit file.
+   * @param lastCommit : the sha key of a commit file
+   * @return the list of the files commit
+   */
+  def readCommit(lastCommit :String) :List[StagedLine] = {
+    val line :List[String] = (".sgit/objects/"+lastCommit).toFile.contentAsString
+      .replace("\r","")
+      .split("\n").toList
+    line.tail.map(l => {
+      val indice = l.split(" ")
+      StagedLine(indice(0),indice(1))
+    })
+  }
+
+  /**
+   * Read the current branch in the HEAD file
+   * @return the current branch
+   */
+  def readHEAD() :String = {
+    (".sgit/HEAD").toFile.contentAsString
+  }
+
+  /**
+   * Read the last commit of a branch
+   * @param branch the current branch
+   * @return the name of the last commit
+   */
+  def readHeads(branch: String) :Option[String] = {
+    if ((".sgit/"+branch).toFile.exists) Some((".sgit/"+ branch).toFile.contentAsString)
+    else None
+  }
+
+  /**
+   * Rerieve all the commit properties and create a commit object.
+   * @param commit commit sha key
+   * @return a commit object
+   */
+  def readCommitProperties(commit: String) :Option[Commit]= {
+    val commitFile = (".sgit/objects/" + commit).toFile
+    if(commitFile.exists) {
+      val content: Seq[String] = commitFile.contentAsString.replace("\r","").split("\n").toList
+      val parents: Seq[String] = content.head.split(" ").toList
+      val allFileElement: Seq[StagedLine] = content.tail.map(f => {
+        val line = f.split(" ")
+        StagedLine(line(0), line(1))
+      })
+      Some(Commit(commit, commitFile.lastModifiedTime, parents, allFileElement))
     } else None
   }
 }

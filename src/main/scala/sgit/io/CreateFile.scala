@@ -3,7 +3,9 @@ package sgit.io
 import java.nio.file.Paths
 
 import better.files._
-import sgit.objects.Blob
+import sgit.objects.{Blob, Commit, StagedLine}
+
+import scala.annotation.tailrec
 
 object CreateFile {
 
@@ -22,6 +24,19 @@ object CreateFile {
         .appendText(file.contentAsString)
       Blob(file.sha1,file.contentAsString, root.relativize(file).toString)
     })
+  }
+
+  /**
+   * Create a commit file.
+   * @param parents parents of the new commit
+   * @return the sha key of the commit file
+   */
+  def createCommit(parents: (String, String), content: Seq[StagedLine]) :String ={
+      val commitFile: File =".sgit/objects/temporaryFile".toFile
+        .createIfNotExists()
+        .appendLine(parents._1 + " " + parents._2)
+        .appendText(WriteFile.createListFileString(content, ""))
+      commitFile.renameTo(commitFile.sha1).sha1
   }
 
   /**

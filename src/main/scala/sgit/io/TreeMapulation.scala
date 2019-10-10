@@ -58,10 +58,10 @@ object TreeMapulation {
    * @param commit : commit
    * @return the whole commit tree
    */
-  def readCommitTree(commit: Commit): TreeElement = {
+ /* def readCommitTree(commit: Commit): TreeElement = {
     val rootFile: String = commit.tree.sha
     buildCommitTree(rootFile)
-  }
+  }*/
 
 
   /**
@@ -94,5 +94,5 @@ object TreeMapulation {
       } else {
         Blob(origin,fileContent, root.relativize(file).toString)
       }
-    }
+  }
 }

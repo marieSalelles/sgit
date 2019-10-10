@@ -27,6 +27,7 @@ object Main extends App {
       case "status" => println("status")
       case "diff" => println("diff")
       case "add" => AddCommand.addAccordingTypeArg(files)
+      case "commit" => CommitCommand.commit()
       case _=> println("Error, write a good command 2")
     }
   }
