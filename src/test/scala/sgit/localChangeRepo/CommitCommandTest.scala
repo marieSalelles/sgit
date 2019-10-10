@@ -3,7 +3,7 @@ package sgit.localChangeRepo
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import sgit.createRepo.InitCommand
 import better.files._
-import sgit.io.{ReadFile, RepoSearching}
+import sgit.io.ReadFile
 import sgit.objects.Commit
 
 class CommitCommandTest  extends FunSpec with BeforeAndAfter {
@@ -14,10 +14,11 @@ class CommitCommandTest  extends FunSpec with BeforeAndAfter {
   after {
     if(".sgit/".toFile.exists) ".sgit".toFile.delete()
     if("READMES.md".toFile.exists) "READMES.md".toFile.delete()
+    if("READMEBIS.md".toFile.exists) "READMEBIS.md".toFile.delete()
   }
   describe("If the user write the command sgit commit in the sgit repository."){
     it("should do nothing idf the staged file is empty") {
-      assert(!CommitCommand.commit().isDefined)
+      assert(CommitCommand.commit().isEmpty)
     }
     it("should create the first commit if the heads folder is empty."){
       //create a file in the repo

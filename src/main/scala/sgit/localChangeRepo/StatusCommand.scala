@@ -1,8 +1,7 @@
 package sgit.localChangeRepo
 
 import better.files.File
-import com.sun.xml.internal.bind.v2.runtime.reflect.Accessor.ReadOnlyFieldReflection
-import sgit.io.{ReadFile, RepoSearching, SearchingTools}
+import sgit.io.{ConsolePrinter, ReadFile, RepoSearching, SearchingTools}
 import sgit.objects.StagedLine
 
 object StatusCommand {
@@ -14,7 +13,7 @@ object StatusCommand {
       val untrackedFiles: Option[Seq[File]] = SearchingTools.searchedUntrackedFiles(workingDirectory)
       //val deletedFiles: Option[Seq[StagedLine]] = SearchingTools.searchDeletedFiles(workingDirectory, stagedFile)
     } else {
-      println("Untracked files :")
+      ConsolePrinter.display("Untracked files :")
       workingDirectory.map(f => println(f.name))
     }
   }

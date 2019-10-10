@@ -1,7 +1,7 @@
 package sgit.localChangeRepo
 
 import better.files.File
-import sgit.io.{CreateFile, RepoSearching, WriteFile}
+import sgit.io.{ConsolePrinter, CreateFile, RepoSearching, WriteFile}
 import sgit.objects.Blob
 
 import scala.util.matching.Regex
@@ -21,7 +21,7 @@ object AddCommand {
         val blobs :Seq[Blob]= CreateFile.createObjectBlob(retrieveFiles.filterNot(f => f.isDirectory))
         //write the staged file
         WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
-        println("Success, the files have been added.")
+        ConsolePrinter.display("Success, the files have been added.")
       }
       else {
         val regexFilename: Regex = "^[a-zA-Z0-9_/]+\\.[A-Za-z]*$".r
@@ -32,7 +32,7 @@ object AddCommand {
           val blobs :Seq[Blob] = CreateFile.createObjectBlob(retrievesFiles)
           //write the staged file
           WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
-          println("Success, the files have been added.")
+          ConsolePrinter.display("Success, the files have been added.")
         } else {
           //Search file in the user repo
           val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head.r)
@@ -41,9 +41,9 @@ object AddCommand {
           //write the staged file
           WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
           //retrieveFiles.filter(f => f.isDirectory)
-          println("Success, the files have been added.")
+          ConsolePrinter.display("Success, the files have been added.")
         }
       }
-    } else println("Enter an argument after the add command.")
+    } else ConsolePrinter.display("Enter an argument after the add command.")
   }
 }

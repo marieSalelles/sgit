@@ -1,7 +1,6 @@
 package sgit.createRepo
 
-import sgit.io.CreateRepository
-import sgit.io.WriteFile
+import sgit.io.{ConsolePrinter, CreateRepository, WriteFile}
 
 object InitCommand {
 
@@ -12,8 +11,8 @@ object InitCommand {
     val status = CreateRepository.initialisation()
     if (status) {
       WriteFile.writeHead("master")
-      println("The repository is created.")
+      ConsolePrinter.display("The repository is created.")
     }
-    else println("An error as occurred. Please try again.")
+    else ConsolePrinter.display("An error as occurred. Please try again.")
   }
 }
