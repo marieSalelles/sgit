@@ -45,7 +45,8 @@ object ReadFile {
     val line :List[String] = (".sgit/objects/"+lastCommit).toFile.contentAsString
       .replace("\r","")
       .split("\n").toList
-    line.tail.map(l => {
+    val contentWithoutParents = line.tail
+    contentWithoutParents.tail.map(l => {
       val indice = l.split(" ")
       StagedLine(indice(0),indice(1))
     })
@@ -79,9 +80,11 @@ object ReadFile {
     val commitFile = (".sgit/objects/" + commit.get).toFile
     if(commitFile.exists) {
       val content: Seq[String] = commitFile.contentAsString.replace("\r","").split("\n").toList
+
       val parents: Seq[String] = content.head.split(" ").toList
-      val message: String = content.tail.head
-      val allFileElement: Seq[StagedLine] = content.tail.map(f => {
+      val contentWithoutParents = content.tail
+      val message: String = contentWithoutParents.head
+      val allFileElement: Seq[StagedLine] = contentWithoutParents.tail.map(f => {
         val line = f.split(" ")
         StagedLine(line(0), line(1))
       })

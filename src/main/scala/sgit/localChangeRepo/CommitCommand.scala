@@ -8,8 +8,7 @@ object CommitCommand {
   def commit(message: String): Option[String] = {
     if(SearchingTools.searchSgitFolder()) {
       //retrieve the last commit
-      val currentBranch = ReadFile.readHEAD()
-      val lastCommit: Option[String] = ReadFile.readHeads(currentBranch)
+      val lastCommit = SearchingTools.findLastCommit()
       //retrieve the file in the staged file
       val stagedFiles: Option[Seq[StagedLine]] = ReadFile.readStaged()
       if (stagedFiles.isEmpty) {
@@ -20,7 +19,6 @@ object CommitCommand {
         val filesToWrite: Seq[StagedLine] = stagedFiles.get
         if (lastCommit.isDefined) {
           val filesPath = filesToWrite.map(f => f.path)
-
           //retrieve the content of the last commit
           val lastCommitContent: Seq[StagedLine] = ReadFile.readCommit(lastCommit.get)
           //create the content of the new commit, replace the old version of file in last commit which are staged
@@ -32,7 +30,7 @@ object CommitCommand {
           //create the commit file with the new files newContent and the file untracked) and the old ones
           val newCommit: String = CreateFile.createCommit((lastCommit.get, ""), newContent.concat(filesToWrite).distinct, message)
           // write the new commit on the current ranch file
-          WriteFile.writeHeadsFile(currentBranch, newCommit)
+          WriteFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
           //clear the staged file
           WriteFile.clearStaged()
           ConsolePrinter.display("Succes, the commit is created.")
@@ -40,8 +38,8 @@ object CommitCommand {
         } else {
           //create the commit file and object
           val newCommit: String = CreateFile.createCommit(("", ""), filesToWrite, message)
-          // write the new commit on the current ranch file
-          WriteFile.writeHeadsFile(currentBranch, newCommit)
+          // write the new commit on the current branch file
+          WriteFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
           //clear the staged file
           WriteFile.clearStaged()
           ConsolePrinter.display("Succes, the commit is created.")

@@ -24,7 +24,7 @@ object Main extends App {
   def determineMode(command: String, option: String, files: Seq[String], message: String): Unit = {
     command match {
       case "init" => InitCommand.createTreeView()
-      case "status" => println("status")
+      case "status" => StatusCommand.statusFile()
       case "diff" => println("diff")
       case "add" => AddCommand.addAccordingTypeArg(files)
       case "commit" => CommitCommand.commit(message)

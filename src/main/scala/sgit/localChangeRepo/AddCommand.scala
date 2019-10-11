@@ -17,11 +17,11 @@ object AddCommand {
       if (files.nonEmpty) {
         if (files.head == ".") {
           //Search file in the user repo
-          val retrieveFiles: Seq[File] = RepoSearching.searchAllDirectoryFile()
+          val retrieveFiles: Seq[File] = RepoSearching.searchAllDirectoryFile(".sgit/").filterNot(f => f.isDirectory)
           //Remove the files that are not modify
-          val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(ReadFile.readHeads(ReadFile.readHEAD())))
+          val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
           //Create files in objects directory
-          val blobs: Seq[Blob] = CreateFile.createObjectBlob(filesToAdd.filterNot(f => f.isDirectory))
+          val blobs: Seq[Blob] = CreateFile.createObjectBlob(filesToAdd)
           //write the staged file
           WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
           ConsolePrinter.display("Success, the files have been added.")
@@ -32,7 +32,7 @@ object AddCommand {
             //Search file in the user repo
             val retrievesFiles: Seq[File] = RepoSearching.searchDirectoryFile(files)
             //Remove the files that are not modify
-            val filesToAdd = SearchingTools.findUnmodifyFiles(retrievesFiles, ReadFile.readCommitProperties(ReadFile.readHeads(ReadFile.readHEAD())))
+            val filesToAdd = SearchingTools.findUnmodifyFiles(retrievesFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
             //Create files in objects directory
             val blobs: Seq[Blob] = CreateFile.createObjectBlob(filesToAdd)
             //write the staged file
@@ -42,7 +42,7 @@ object AddCommand {
             //Search file in the user repo
             val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head.r)
             //Remove the files that are not modify
-            val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(ReadFile.readHeads(ReadFile.readHEAD())))
+            val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
             //Create files in objects directory
             val blobs: Seq[Blob] = CreateFile.createObjectBlob(filesToAdd.filterNot(f => f.isDirectory))
             //write the staged file

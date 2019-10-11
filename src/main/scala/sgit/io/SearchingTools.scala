@@ -7,24 +7,51 @@ import scala.annotation.tailrec
 
 object SearchingTools {
 
+  /**
+   * Search the .sgit folder
+   * @return true if the .sgit exists
+   */
   def searchSgitFolder(): Boolean ={
     ".sgit/".toFile.exists
   }
 
   /**
-   * Search the untracked files.
-   * @param workingDirectory : the working directory folders and files
-   * @return all the untracked files
+   * Search the last commit
+   * @return the sha key of the last commit if it exists.
    */
-  def searchedUntrackedFiles(workingDirectory: Seq[File]): Option[Seq[File]] = {
-    val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
-    val untrackedFile: Seq[File] = wdFiles.filterNot(f => ("./sgit/objects/"+ f.sha1).toFile.exists)
-    if (untrackedFile.isEmpty) None
-    else Some(untrackedFile)
+  def findLastCommit(): Option[String] = {
+    val currentBranch = ReadFile.readHEAD()
+    ReadFile.readHeads(currentBranch)
   }
 
   /**
-   * Retrieve the files which are modified, added.
+   * Search the untracked files (it are not in the objects directory).
+   * @param workingDirectory : the working directory folders and files
+   * @return all the untracked files path
+   */
+  def searchedUntrackedFiles(workingDirectory: Seq[File], stagedFile: Option[Seq[StagedLine]]): Option[Seq[String]] = {
+    val root = ".sgit/".toFile.parent
+    //take all the files
+    val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
+    //search the file with sha not in objects folder
+    val untrackedFile: Seq[File] = wdFiles.filterNot(f => (".sgit/objects/"+ f.sha1).toFile.exists)
+    if (stagedFile.nonEmpty) {
+      //retrieve path of file in staged
+      val stagedPaths: Seq[String] = stagedFile.get.map(sf => sf.path)
+      //retrieve the untracked file which are not in the staged file
+      val untrackedFilePaths: Seq[File] = untrackedFile.filterNot(file => stagedPaths.contains(root.relativize(file).toString))
+
+      if (untrackedFilePaths.isEmpty) None
+      else {
+        Some(untrackedFilePaths.map(f => root.relativize(f).toString))
+      }
+      // return the working directory if no added files
+    } else Some(untrackedFile.map(f => root.relativize(f).toString))
+  }
+
+  /**
+   * Retrieve the files which are modified, added when the user add files.
+   * Delete the unmodified files when the user adds some files.
    * @param addedFile : files that the user would like to add.
    * @param lastCommit : last commit
    * @return the file sequence of the files to add.
@@ -41,15 +68,52 @@ object SearchingTools {
   /**
    * Search the deleted file
    * @param workingDirectory : the working directory folders and files
-   * @param stagedFiles : the list of files contains in the staged file
-   * @return the deleted file
+   * @param commit : the list of files contains in the last commit
+   * @return the deleted file path
    */
-  /*def searchDeletedFiles(workingDirectory: Seq[File], stagedFiles: Seq[StagedLine]): Option[Seq[File]] = {
-    val staged = stagedFiles.map(f => f.path.toFile)
-    val deletedFiles = staged.filterNot(f => workingDirectory.contains(f))
+  def searchDeletedFiles(workingDirectory: Seq[File], commit: Seq[StagedLine]): Option[Seq[String]] = {
+    val commitContent: Seq[File] = commit.map(f => f.path.toFile)
+    val deletedFiles: Seq[File] = commitContent.filterNot(f => workingDirectory.contains(f))
     if (deletedFiles.isEmpty) None
-    else Some(deletedFiles)
-  }*/
+    else {
+      val root = ".sgit/".toFile.parent
+      Some(deletedFiles.map(f => root.relativize(f).toString))
+    }
+  }
+
+  /**
+   * Search the modified file between the last commit and the working directory.
+   * @param workingDirectory : working directory files
+   * @param commitContent : commit files
+   * @return the modified files (sha and path)
+   */
+  def searchedModifiedFiles(workingDirectory: Seq[File], commitContent: Seq[StagedLine]): Option[Seq[StagedLine]] = {
+    //take all the files
+    val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
+    val root = ".sgit/".toFile.parent
+    //retrieve path of commit files
+    val commitFilesPath: Seq[String] = commitContent.map(f => f.path)
+    //file with same path, return file in the working directory
+    val fileSamePath: Seq[File] = wdFiles.filter( f => commitFilesPath.contains(root.relativize(f).toString))
+    //generate sha of files with same path (working directory path)
+    val fileSha: Seq[String] = fileSamePath.map(f => f.sha1)
+    //modified files
+    val modifiedFiles: Seq[StagedLine] = commitContent.filterNot(cf => fileSha.contains(cf.sha))
+    if (modifiedFiles.isEmpty) None
+    else Some(modifiedFiles)
+  }
+
+  /**
+   * Retrieve the files which are for the first time added by the user.
+   * @param stagedFiles : files contain in the staged file.
+   * @param commit : last commit files
+   * @return the list of the files added for the first time by the user.
+   */
+  def toBeCommittedFileAdded(stagedFiles: Seq[StagedLine], commit: Seq[StagedLine]) :Option[Seq[StagedLine] ]= {
+    val result: Seq[StagedLine] = stagedFiles.filterNot(sf => commit.contains(sf))
+    if (result.isEmpty) None
+    else Some(result)
+  }
 
   /**
    * Search all the folder in a path

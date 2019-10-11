@@ -59,7 +59,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       val args :Seq[String] = Seq(".")
       AddCommand.addAccordingTypeArg(args)
 
-      val files = RepoSearching.searchAllDirectoryFile()
+      val files = RepoSearching.searchAllDirectoryFile(".sgit/")
       //generate sha key to files
       val files2 = files.filterNot(f => f.isDirectory)
       val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))

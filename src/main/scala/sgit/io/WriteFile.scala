@@ -49,7 +49,7 @@ object WriteFile {
    * @param commit the new commit
    */
   def writeHeadsFile(branch: String, commit: String):Unit = {
-    (".sgit/"+branch).toFile.overwrite(commit)
+    (".sgit/"+branch).toFile.createIfNotExists().overwrite(commit)
   }
 
   /**
