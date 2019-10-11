@@ -1,11 +1,15 @@
 package sgit.io
 
 import better.files._
-import sgit.objects.StagedLine
+import sgit.objects.{Commit, StagedLine}
 
 import scala.annotation.tailrec
 
 object SearchingTools {
+
+  def searchSgitFolder(): Boolean ={
+    ".sgit/".toFile.exists
+  }
 
   /**
    * Search the untracked files.
@@ -17,6 +21,21 @@ object SearchingTools {
     val untrackedFile: Seq[File] = wdFiles.filterNot(f => ("./sgit/objects/"+ f.sha1).toFile.exists)
     if (untrackedFile.isEmpty) None
     else Some(untrackedFile)
+  }
+
+  /**
+   * Retrieve the files which are modified, added.
+   * @param addedFile : files that the user would like to add.
+   * @param lastCommit : last commit
+   * @return the file sequence of the files to add.
+   */
+  def findUnmodifyFiles(addedFile: Seq[File], lastCommit: Option[Commit]): Seq[File] = {
+    val root = ".sgit/".toFile.parent
+    if(lastCommit.isDefined){
+      val commitContent: Seq[StagedLine] = lastCommit.get.files
+      val commitNames: Seq[String] = commitContent.map(f => f.path)
+      addedFile.filterNot(f=> commitNames.contains(root.relativize(f).toString))
+    } else addedFile
   }
 
   /**
@@ -38,18 +57,18 @@ object SearchingTools {
    * @param allFiles : all the files and folders
    * @return all the files and folders
    */
-  /*@tailrec
+  @tailrec
   def retrieveFoldersWithPath(paths: Seq[String], allFiles: Seq[File]) :Seq[File] = {
     val path :String = paths.head
     if (paths.isEmpty) allFiles
     else if (path.toFile.exists) {
       val nodes: Seq[String] = path.replace("\\","/").split("/").toList
-      val nodeFiles = nodes.map(n => n.toFile)
+      val nodeFiles :Seq[File] = nodes.map(n => n.toFile)
       val newNodes: Seq[File] = nodeFiles.filterNot(file => allFiles.contains(file))
-      retrieveFoldersWithPath(paths.tail, allFiles :+ newNodes)
+      retrieveFoldersWithPath(paths.tail, allFiles.concat(newNodes))
     }
     else retrieveFoldersWithPath(paths.tail, allFiles)
-  }*/
+  }
 
   /**
    * Search folder children in a sequence of folders/files

@@ -29,7 +29,12 @@ object Parser {
         ),
       cmd("commit")
           .action((_,c) => c.copy(command = "commit"))
-          .text("Record changes to the repository."),
+          .text("Record changes to the repository.")
+          .children(
+            arg[String]("message")
+              .action((x, c) => c.copy(message = x))
+              .text("Commit message.")
+          ),
         checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")

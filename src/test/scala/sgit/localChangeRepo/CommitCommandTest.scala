@@ -18,7 +18,7 @@ class CommitCommandTest  extends FunSpec with BeforeAndAfter {
   }
   describe("If the user write the command sgit commit in the sgit repository."){
     it("should do nothing idf the staged file is empty") {
-      assert(CommitCommand.commit().isEmpty)
+      assert(CommitCommand.commit("First commit.").isEmpty)
     }
     it("should create the first commit if the heads folder is empty."){
       //create a file in the repo
@@ -29,7 +29,7 @@ class CommitCommandTest  extends FunSpec with BeforeAndAfter {
       // add the file to the staged file
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
 
-      val commit = CommitCommand.commit()
+      val commit = CommitCommand.commit("First commit")
       assert(commit.isDefined)
       assert(".sgit/refs/heads/master".toFile.exists)
 
@@ -48,18 +48,19 @@ class CommitCommandTest  extends FunSpec with BeforeAndAfter {
       // add the file to the staged file
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
       // create the first commit
-      val firstCommit = CommitCommand.commit()
+      val firstCommit = CommitCommand.commit("First commit")
       // add another file
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
       // create the second commit
-      val commit = CommitCommand.commit()
+      val commit = CommitCommand.commit("Second commit")
 
       assert(commit.isDefined)
       // retrieve the value of the last created commit on the master branch
       val commitInHeads: String = ".sgit/refs/heads/master".toFile.contentAsString
       //retrieve the info of the second commit
-      val secondCommitInfos: Commit = ReadFile.readCommitProperties(commit.get).get
-      assert(secondCommitInfos.parents.head == firstCommit.get)
+      val secondCommitInfos: Option[Commit] = ReadFile.readCommitProperties(commit)
+
+      assert(secondCommitInfos.get.parents.head == firstCommit.get)
 
       assert(commitInHeads == commit.get)
       assert(".sgit/staged".toFile.contentAsString.isEmpty)

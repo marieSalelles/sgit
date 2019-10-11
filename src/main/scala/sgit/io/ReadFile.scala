@@ -74,16 +74,18 @@ object ReadFile {
    * @param commit commit sha key
    * @return a commit object
    */
-  def readCommitProperties(commit: String) :Option[Commit]= {
-    val commitFile = (".sgit/objects/" + commit).toFile
+  def readCommitProperties(commit: Option[String]) :Option[Commit]= {
+    if(commit.isEmpty) return None
+    val commitFile = (".sgit/objects/" + commit.get).toFile
     if(commitFile.exists) {
       val content: Seq[String] = commitFile.contentAsString.replace("\r","").split("\n").toList
       val parents: Seq[String] = content.head.split(" ").toList
+      val message: String = content.tail.head
       val allFileElement: Seq[StagedLine] = content.tail.map(f => {
         val line = f.split(" ")
         StagedLine(line(0), line(1))
       })
-      Some(Commit(commit, commitFile.lastModifiedTime, parents, allFileElement))
+      Some(Commit(commit.get, commitFile.lastModifiedTime, parents, allFileElement, message))
     } else None
   }
 }

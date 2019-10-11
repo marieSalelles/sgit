@@ -31,10 +31,11 @@ object CreateFile {
    * @param parents parents of the new commit
    * @return the sha key of the commit file
    */
-  def createCommit(parents: (String, String), content: Seq[StagedLine]) :String ={
+  def createCommit(parents: (String, String), content: Seq[StagedLine], message: String) :String ={
       val commitFile: File =".sgit/objects/temporaryFile".toFile
         .createIfNotExists()
         .appendLine(parents._1 + " " + parents._2)
+        .appendLine(message)
         .appendText(WriteFile.createListFileString(content, ""))
       commitFile.renameTo(commitFile.sha1).sha1
   }
