@@ -35,16 +35,13 @@ object SearchingTools {
     val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
     //search the file with sha not in objects folder
     val untrackedFile: Seq[File] = wdFiles.filterNot(f => (".sgit/objects/"+ f.sha1).toFile.exists)
+
     if (stagedFile.nonEmpty) {
       //retrieve path of file in staged
       val stagedPaths: Seq[String] = stagedFile.get.map(sf => sf.path)
       //retrieve the untracked file which are not in the staged file
       val untrackedFilePaths: Seq[File] = untrackedFile.filterNot(file => stagedPaths.contains(root.relativize(file).toString))
-
-      if (untrackedFilePaths.isEmpty) None
-      else {
-        Some(untrackedFilePaths.map(f => root.relativize(f).toString))
-      }
+      if (untrackedFilePaths.isEmpty) None else Some(untrackedFilePaths.map(f => root.relativize(f).toString))
       // return the working directory if no added files
     } else Some(untrackedFile.map(f => root.relativize(f).toString))
   }
@@ -83,6 +80,7 @@ object SearchingTools {
 
   /**
    * Search the modified file between the last commit and the working directory.
+   * files classify into stages : Changes to be committed added and modified and Not staged for commit modified.
    * @param workingDirectory : working directory files
    * @param commitContent : commit files
    * @return the modified files (sha and path)
@@ -99,8 +97,7 @@ object SearchingTools {
     val fileSha: Seq[String] = fileSamePath.map(f => f.sha1)
     //modified files
     val modifiedFiles: Seq[StagedLine] = commitContent.filterNot(cf => fileSha.contains(cf.sha))
-    if (modifiedFiles.isEmpty) None
-    else Some(modifiedFiles)
+    if (modifiedFiles.isEmpty) None else Some(modifiedFiles)
   }
 
   /**

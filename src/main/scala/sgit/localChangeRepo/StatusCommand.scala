@@ -26,25 +26,22 @@ object StatusCommand {
       //modified files
       val modifiedFiles: Option[Seq[StagedLine]] = SearchingTools.searchedModifiedFiles(workingDirectory,commitContent)
 
-      if (stagedFile.isDefined && modifiedFiles.isDefined){
-
+      if (stagedFile.isDefined && modifiedFiles.isDefined) {
         //retrieve the modified files which are not in the staged file (not added)
-        val modFiles: Seq[StagedLine] = modifiedFiles.get.diff(stagedFile.get)
-
-        //retrieve the modified files which are in the staged file (added)
-        val staFiles: Seq[StagedLine] = stagedFile.get.diff(modifiedFiles.get)
+        val modFilesWD: Seq[StagedLine] = modifiedFiles.get.diff(stagedFile.get)
 
         //files which are not staged (not added) but modified
         ConsolePrinter.display("Not staged for commit:")
         ConsolePrinter.display("Modified ")
-        ConsolePrinter.displayList(modFiles.map(f => f.path))
+        ConsolePrinter.displayList(modFilesWD.map(f => f.path))
         // add the untracked files and deleted files (they are not in the staged file)
-        untrackedFiles(workingDirectory,stagedFile)
-        deleteFiles(workingDirectory,stagedFile)
+        untrackedFiles(workingDirectory, stagedFile)
+        deleteFiles(workingDirectory, stagedFile)
 
-       //staged files (added)
+        //staged files (added)
         ConsolePrinter.display("Changes to be committed:")
-        toBeCommitted(staFiles,commitContent)
+        toBeCommitted(stagedFile.get, commitContent)
+
 
         //there are no files into the staged file (no files added) and there are modified files
       } else if(stagedFile.isEmpty && modifiedFiles.nonEmpty) {
