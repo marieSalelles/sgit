@@ -10,74 +10,74 @@ object StatusCommand {
    * Classify the files according to their current stages and sub-stages.
    */
   def statusFile():Unit = {
-    //working directory files
-    val workingDirectory: Seq[File] = RepoSearching.searchAllDirectoryFile(".sgit/").filterNot(f => f.isDirectory)
-    //staged files
-    val stagedFile :Option[Seq[StagedLine]]= ReadFile.readStaged()
+    if(SearchingTools.searchSgitFolder()) {
+      //working directory files
+      val workingDirectory: Seq[File] = RepoSearching.searchAllDirectoryFile(".sgit/").filterNot(f => f.isDirectory)
+      //staged files
+      val stagedFile: Option[Seq[StagedLine]] = ReadFile.readStaged()
 
-    //retrieve last commit
-    val lastCommit: Option[String] = SearchingTools.findLastCommit()
+      //retrieve last commit
+      val lastCommit: Option[String] = SearchingTools.findLastCommit()
 
-    //if the last commit exists
-    if (lastCommit.isDefined) {
-      //content of last commit
-      val commitContent = ReadFile.readCommit(lastCommit.get)
+      //write the current branch
+      ConsolePrinter.display("The current branch is " +ReadFile.readHEAD().split("/").toList.last)
 
-      //modified files
-      val modifiedFiles: Option[Seq[StagedLine]] = SearchingTools.searchedModifiedFiles(workingDirectory,commitContent)
+      //if the last commit exists
+      if (lastCommit.isDefined) {
+        //print the last commit sha key
+        ConsolePrinter.display("The last commit is " + lastCommit.get)
+        //content of last commit
+        val commitContent = ReadFile.readCommit(lastCommit.get)
 
-      if (stagedFile.isDefined && modifiedFiles.isDefined) {
-        //retrieve the modified files which are not in the staged file (not added)
-        val modFilesWD: Seq[StagedLine] = modifiedFiles.get.diff(stagedFile.get)
+        //modified files
+        val modifiedFiles: Option[Seq[StagedLine]] = SearchingTools.searchedModifiedFiles(workingDirectory, commitContent)
 
-        //files which are not staged (not added) but modified
-        ConsolePrinter.display("Not staged for commit:")
-        ConsolePrinter.display("Modified ")
-        ConsolePrinter.displayList(modFilesWD.map(f => f.path))
-        // add the untracked files and deleted files (they are not in the staged file)
+        if (stagedFile.isDefined && modifiedFiles.isDefined) {
+          //retrieve the modified files which are not in the staged file (not added)
+          val modFilesWD: Seq[StagedLine] = modifiedFiles.get.diff(stagedFile.get)
+
+          //files which are not staged (not added) but modified
+          ConsolePrinter.printStatus("\u001B[31m"+"Not staged for commit:"+"\u001B[0m", "\u001B[35m"+"Modified "+"\u001B[0m", modFilesWD.map(f => f.path))
+
+          // add the untracked files and deleted files (they are not in the staged file)
+          untrackedFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory, stagedFile)
+
+          //staged files (added)
+          toBeCommitted(stagedFile.get, commitContent)
+
+          //there are no files into the staged file (no files added) and there are modified files
+        } else if (stagedFile.isEmpty && modifiedFiles.nonEmpty) {
+          //files which are not staged (not added)
+          ConsolePrinter.printStatus("\u001B[31m"+"Not staged for commit:"+"\u001B[0m", "\u001B[35m"+"Modified "+"\u001B[0m", modifiedFiles.get.map(f => f.path))
+
+          // add the untracked files and deleted files (they are not in the staged file)
+          untrackedFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory, stagedFile)
+
+          //there are no modified files but there are files into staged file (untracked files are added)
+        } else if (modifiedFiles.isEmpty && stagedFile.nonEmpty) {
+          untrackedFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory, stagedFile)
+          //staged files (added)
+          ConsolePrinter.printStatus("\u001B[32m" +"Changes to be committed:"+"\u001B[0m", "\u001B[35m"+"Added "+"\u001B[0m", stagedFile.get.map(f => f.path))
+
+          //there are no modification and no files addd
+        } else if (modifiedFiles.isEmpty && stagedFile.isEmpty) {
+          untrackedFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory, stagedFile)
+        }
+      } else {
+        //there is no commit created
+        //retrieve the untracked files
         untrackedFiles(workingDirectory, stagedFile)
-        deleteFiles(workingDirectory, stagedFile)
-
-        //staged files (added)
-        ConsolePrinter.display("Changes to be committed:")
-        toBeCommitted(stagedFile.get, commitContent)
-
-
-        //there are no files into the staged file (no files added) and there are modified files
-      } else if(stagedFile.isEmpty && modifiedFiles.nonEmpty) {
-        //files which are not staged (not added)
-        ConsolePrinter.display("Not staged for commit:")
-        ConsolePrinter.display("Modified ")
-        ConsolePrinter.displayList(modifiedFiles.get.map(f => f.path))
-
-        // add the untracked files and deleted files (they are not in the staged file)
-        untrackedFiles(workingDirectory,stagedFile)
-        deleteFiles(workingDirectory,stagedFile)
-
-        //there are no modified files but there are files into staged file (untracked files are added)
-      } else if (modifiedFiles.isEmpty && stagedFile.nonEmpty) {
-        //staged files (added)
-        ConsolePrinter.display("Changes to be committed:")
-        ConsolePrinter.display("Added ")
-        ConsolePrinter.displayList(stagedFile.get.map(f => f.path))
-
-        //there are no modification and no files addd
-      } else if (modifiedFiles.isEmpty && stagedFile.isEmpty ) {
-        untrackedFiles(workingDirectory,stagedFile)
-        deleteFiles(workingDirectory,stagedFile)
+        //retrieve the staged files (added)
+        if (stagedFile.nonEmpty) {
+          deleteFiles(workingDirectory, stagedFile)
+          ConsolePrinter.printStatus("\u001B[32m"+"Changes to be committed:"+"\u001B[0m", "\u001B[35m"+"Added "+"\u001B[0m", stagedFile.get.map(f => f.path))
+        }
       }
-    } else {
-      //there is no commit created
-      //retrieve the untracked files
-      ConsolePrinter.display("Not staged for commit:")
-      untrackedFiles(workingDirectory, stagedFile)
-      //retrieve the staged files (added)
-      if (stagedFile.nonEmpty) {
-        ConsolePrinter.display("Changes to be committed:")
-        ConsolePrinter.display("Added ")
-        ConsolePrinter.displayList(stagedFile.get.map( f => f.path))
-      }
-    }
+    } else ConsolePrinter.display("Do a sgit init before a sgit status.")
   }
 
   /**
@@ -90,10 +90,8 @@ object StatusCommand {
       //untracked files
       val untrackedFiles: Option[Seq[String]] = SearchingTools.searchedUntrackedFiles(workingDirectory,stagedFile)
 
-      if(untrackedFiles.isDefined) {
-        ConsolePrinter.display("Untracked files ")
-        ConsolePrinter.displayList(untrackedFiles.get)
-      }
+      if(untrackedFiles.isDefined) ConsolePrinter.printStatus("\u001B[31m"+"Not staged for commit:"+"\u001B[0m","\u001B[35m"+"Untracked files "+"\u001B[0m",untrackedFiles.get)
+
   }
 
   /**
@@ -112,10 +110,7 @@ object StatusCommand {
 
       //deleted files
       val deletedFile: Option[Seq[String]] = SearchingTools.searchDeletedFiles(workingDirectory, commitContent)
-      if (deletedFile.nonEmpty) {
-        ConsolePrinter.display("Deleted ")
-        ConsolePrinter.displayList(deletedFile.get)
-      }
+      if (deletedFile.nonEmpty) ConsolePrinter.printStatus("\u001B[31m"+"Not staged for commit:"+"\u001B[0m","\u001B[35m"+"Deleted "+"\u001B[0m",deletedFile.get)
     }
   }
 
@@ -129,21 +124,13 @@ object StatusCommand {
     val addedFileIntoSgit: Option[Seq[StagedLine]] = SearchingTools.toBeCommittedFileAdded(stagedFiles, commitContent)
 
     if (addedFileIntoSgit.nonEmpty) {
-      ConsolePrinter.display("Added ")
-      ConsolePrinter.displayList(addedFileIntoSgit.get.map(af => af.path))
+      ConsolePrinter.printStatus("\u001B[32m"+"Changes to be committed:"+"\u001B[0m","\u001B[35m"+"Added "+"\u001B[0m",addedFileIntoSgit.get.map(af => af.path))
 
       // retrieve the modified files already into sgit
       val fileAlreadyIntoSgit: Seq[StagedLine] = stagedFiles.diff(addedFileIntoSgit.get)
 
-      if(fileAlreadyIntoSgit.nonEmpty) {
-        ConsolePrinter.display("Modified ")
-        ConsolePrinter.displayList(fileAlreadyIntoSgit.map(mf => mf.path))
-      }
-    }
-    else {
-      ConsolePrinter.display("Modified ")
-      ConsolePrinter.displayList(stagedFiles.map(sf => sf.path))
-    }
+      if(fileAlreadyIntoSgit.nonEmpty) ConsolePrinter.printStatus("\u001B[32m"+"Changes to be committed:"+"\u001B[0m","\u001B[35m"+"Modified "+"\u001B[0m",fileAlreadyIntoSgit.map(mf => mf.path))
+    }  else ConsolePrinter.printStatus("\u001B[32m"+"Changes to be committed:"+"\u001B[0m","\u001B[35m"+"Modified "+"\u001B[0m",stagedFiles.map(sf => sf.path))
   }
 
 }

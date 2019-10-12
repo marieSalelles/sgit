@@ -17,7 +17,7 @@ class CommitCommandTest  extends FunSpec with BeforeAndAfter {
     if("READMEBIS.md".toFile.exists) "READMEBIS.md".toFile.delete()
   }
   describe("If the user write the command sgit commit in the sgit repository."){
-    it("should do nothing idf the staged file is empty") {
+    it("should do nothing if the staged file is empty") {
       assert(CommitCommand.commit("First commit.").isEmpty)
     }
     it("should create the first commit if the heads folder is empty."){

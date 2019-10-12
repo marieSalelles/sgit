@@ -57,8 +57,9 @@ object SearchingTools {
     val root = ".sgit/".toFile.parent
     if(lastCommit.isDefined){
       val commitContent: Seq[StagedLine] = lastCommit.get.files
-      val commitNames: Seq[String] = commitContent.map(f => f.path)
-      addedFile.filterNot(f=> commitNames.contains(root.relativize(f).toString))
+      val commitFileNames: Seq[String] = commitContent.map(f => f.sha)
+      val commitFilePaths: Seq[String] = commitContent.map(f => f.path)
+      addedFile.filterNot(f=> (commitFilePaths.contains(root.relativize(f).toString) && commitFileNames.contains(f.sha1)))
     } else addedFile
   }
 
@@ -71,6 +72,7 @@ object SearchingTools {
   def searchDeletedFiles(workingDirectory: Seq[File], commit: Seq[StagedLine]): Option[Seq[String]] = {
     val commitContent: Seq[File] = commit.map(f => f.path.toFile)
     val deletedFiles: Seq[File] = commitContent.filterNot(f => workingDirectory.contains(f))
+
     if (deletedFiles.isEmpty) None
     else {
       val root = ".sgit/".toFile.parent
@@ -91,12 +93,14 @@ object SearchingTools {
     val root = ".sgit/".toFile.parent
     //retrieve path of commit files
     val commitFilesPath: Seq[String] = commitContent.map(f => f.path)
+    //retrieve sha of commit files
+    val commitFilesSha: Seq[String] = commitContent.map(f => f.sha)
     //file with same path, return file in the working directory
     val fileSamePath: Seq[File] = wdFiles.filter( f => commitFilesPath.contains(root.relativize(f).toString))
-    //generate sha of files with same path (working directory path)
-    val fileSha: Seq[String] = fileSamePath.map(f => f.sha1)
     //modified files
-    val modifiedFiles: Seq[StagedLine] = commitContent.filterNot(cf => fileSha.contains(cf.sha))
+    val modifiedFiles: Seq[StagedLine] = fileSamePath
+      .filterNot(cf => commitFilesSha.contains(cf.sha1))
+      .map(file => StagedLine(file.sha1, root.relativize(file).toString))
     if (modifiedFiles.isEmpty) None else Some(modifiedFiles)
   }
 
@@ -107,7 +111,8 @@ object SearchingTools {
    * @return the list of the files added for the first time by the user.
    */
   def toBeCommittedFileAdded(stagedFiles: Seq[StagedLine], commit: Seq[StagedLine]) :Option[Seq[StagedLine] ]= {
-    val result: Seq[StagedLine] = stagedFiles.filterNot(sf => commit.contains(sf))
+    val commitPath: Seq[String] = commit.map(c => c.path)
+    val result: Seq[StagedLine] = stagedFiles.filterNot(sf => commitPath.contains(sf.path))
     if (result.isEmpty) None
     else Some(result)
   }

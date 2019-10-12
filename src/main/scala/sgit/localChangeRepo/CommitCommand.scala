@@ -8,7 +8,7 @@ object CommitCommand {
   def commit(message: String): Option[String] = {
     if(SearchingTools.searchSgitFolder()) {
       //retrieve the last commit
-      val lastCommit = SearchingTools.findLastCommit()
+      val lastCommit: Option[String] = SearchingTools.findLastCommit()
       //retrieve the file in the staged file
       val stagedFiles: Option[Seq[StagedLine]] = ReadFile.readStaged()
       if (stagedFiles.isEmpty) {
