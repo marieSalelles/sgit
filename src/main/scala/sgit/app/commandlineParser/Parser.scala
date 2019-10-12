@@ -35,6 +35,18 @@ object Parser {
               .action((x, c) => c.copy(message = x))
               .text("Commit message.")
           ),
+      cmd("log")
+          .action((_,c)=> c.copy(command = "log"))
+          .text("Show commit logs.")
+        .children(
+          opt[Unit]("p")
+            .abbr("p")
+            .action((_, c) => c.copy(option = "p"))
+            .text("Shows the changes over time."),
+          opt[Unit]("stat")
+            .action((_, c) => c.copy(option = "stat"))
+            .text("Generate a diffstat.")
+        ),
         checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")

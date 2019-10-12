@@ -28,13 +28,20 @@ object Main extends App {
       case "diff" => println("diff")
       case "add" => AddCommand.addAccordingTypeArg(files)
       case "commit" => CommitCommand.commit(message)
+      case "log" => determineOpt(option, "log")
       case _=> println("Error, write a good command 2")
     }
   }
 
-  /*def determineOpt(opt: String, arg: String){
-
-  }*/
+  def determineOpt(opt: String, command: String){
+    if (command == "log") {
+      opt match {
+        case ""=> println("log")
+        case stat => println("log stat")
+        case p => println("log p")
+      }
+    }
+  }
 
 
 }

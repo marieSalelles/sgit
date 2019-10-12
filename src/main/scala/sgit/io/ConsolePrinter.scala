@@ -1,6 +1,6 @@
 package sgit.io
 
-import better.files.File
+import java.util.Date
 
 import scala.annotation.tailrec
 
@@ -32,8 +32,20 @@ object ConsolePrinter {
    * @param files : file path list to print
    */
   def printStatus(state: String, subState: String, files: Seq[String]): Unit ={
-    ConsolePrinter.display(state)
-    ConsolePrinter.display(subState)
-    ConsolePrinter.displayList(files)
+    display(state)
+    display(subState)
+    displayList(files)
+  }
+
+  /**
+   * Print the commit infos.
+   * @param name : commit name
+   * @param date : commit date
+   * @param message : commit description
+   */
+  def printCommit(name: String, date: Date, message: String): Unit = {
+    display("\u001B[35m" + "Commit name: "+ "\u001B[0m" + name)
+    display("\u001B[35m" + "Date: "+"\u001B[0m" + date)
+    display("\u001B[35m" + "Description: "+"\u001B[0m" + message + "\n")
   }
 }
