@@ -6,7 +6,7 @@ import better.files._
 import sgit.io.ReadFile
 import sgit.objects.Commit
 
-class CommitCommandTest  extends FunSpec with BeforeAndAfter {
+class CommitCommandTest extends FunSpec with BeforeAndAfter {
   before {
     if(".sgit/".toFile.exists) ".sgit".toFile.delete()
     InitCommand.createTreeView()

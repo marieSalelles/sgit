@@ -21,6 +21,19 @@ object ReadFile {
   }
 
   /**
+   * Retrieve the content of the file
+   * @param f : file sha key
+   * @return the name of the file
+   */
+  def readBlobContent(f :String) :String= {
+    val currentFolder = (".sgit/objects/"+ f)
+    if (Files.exists(Paths.get(currentFolder)) && f != "") {
+      val content :String = currentFolder.toFile.contentAsString
+      content.substring(content.indexOf("\n"))
+    } else ""
+  }
+
+  /**
    * Read the content of the stages file.
    * @return the list of the added files.
    */

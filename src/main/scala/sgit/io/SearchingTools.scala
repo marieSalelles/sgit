@@ -1,7 +1,7 @@
 package sgit.io
 
 import better.files._
-import sgit.objects.{Commit, StagedLine}
+import sgit.objects.{Blob, Commit, StagedLine}
 
 import scala.annotation.tailrec
 
@@ -115,6 +115,56 @@ object SearchingTools {
     val result: Seq[StagedLine] = stagedFiles.filterNot(sf => commitPath.contains(sf.path))
     if (result.isEmpty) None
     else Some(result)
+  }
+
+  /**
+   * Search the different files between the working directory and the last commit.
+   * @param workingDirectory : working directory files
+   * @param commitContent : lest commit files
+   * @return a sequence of tuple which contains the a blob of the last commit file and blobs of the working directory file for the same file
+   */
+  def searchDifferentFileBetweenWDCommit(workingDirectory: Seq[File], commitContent: Seq[StagedLine]): Option[Seq[(Blob, Blob)]] = {
+    //take all the working directory files
+    val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
+    val root = ".sgit/".toFile.parent
+    //retrieve path of commit files
+    val commitFilesPath: Seq[String] = commitContent.map(f => f.path)
+    //retrieve sha of commit files
+    val commitFilesSha: Seq[String] = commitContent.map(f => f.sha)
+    //files with same path, return files in the working directory
+    val fileSamePath: Seq[File] = wdFiles.filter( f => commitFilesPath.contains(root.relativize(f).toString))
+
+    //retrieve the different files
+    val differentFilesBlob: Seq[(Blob,Blob)]= fileSamePath.iterator.map(f =>
+      if(!commitFilesSha.contains(f.sha1)){
+        val tuple = retrieveFilesWDCommit(root.relativize(f).toString,commitContent, wdFiles)
+        if (tuple.isDefined) tuple.get
+        else null
+      } else null
+    ).filterNot(f => f == null).toList
+
+    if (differentFilesBlob.nonEmpty) Some(differentFilesBlob)
+    else None
+  }
+
+  /**
+   * Retrieve the same file into the last commit and the working directory
+   * @param path: file path
+   * @param commitContent : last commit content
+   * @param wdFiles : working directory files
+   * @return a tuple of blobs with in first the file contains in the commit and in second the file contains in the working directory
+   */
+  def retrieveFilesWDCommit(path: String, commitContent: Seq[StagedLine], wdFiles: Seq[File]): Option[(Blob,Blob)] = {
+    val sameFileCommit: Seq[StagedLine] = commitContent.filter(cf => cf.path == path)
+    if (sameFileCommit.nonEmpty) {
+      val root = ".sgit/".toFile.parent
+      val sameFileWD: Seq[File] = wdFiles.filter(wdf => root.relativize(wdf).toString == path)
+      if(sameFileWD.nonEmpty){
+        val contentCommitFile = ReadFile.readBlobContent(sameFileCommit.head.sha)
+        Some((Blob(sameFileCommit.head.sha, contentCommitFile, sameFileCommit.head.path),
+          Blob(sameFileWD.head.sha1, sameFileWD.head.contentAsString, root.relativize(sameFileWD.head).toString)))
+      } else None
+    } else None
   }
 
   /**

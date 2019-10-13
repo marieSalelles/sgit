@@ -25,7 +25,7 @@ object Main extends App {
     command match {
       case "init" => InitCommand.createTreeView()
       case "status" => StatusCommand.statusFile()
-      case "diff" => println("diff")
+      case "diff" => DiffCommand.diffBetweenCommitWD()
       case "add" => AddCommand.addAccordingTypeArg(files)
       case "commit" => CommitCommand.commit(message)
       case "log" => determineOpt(option, "log")
