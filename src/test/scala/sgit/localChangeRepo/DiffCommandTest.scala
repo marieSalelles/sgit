@@ -14,10 +14,14 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
       .toFile
       .createIfNotExists()
       .appendLine("I am a test file.")
+
     val _: File=  ("READMEBIS.md")
       .toFile
       .createIfNotExists()
       .appendLine("Test file.")
+      .appendLine("Second line.")
+      .appendLine("Third line.")
+      .appendLine("Fourth line.")
   }
     after{
       if(".sgit/".toFile.exists) ".sgit".toFile.delete()
@@ -57,7 +61,7 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
         assert(differentFile.get.length == 1)
         assert(differentFile.get.head._1.path == root.relativize("READMES.md".toFile).toString )
 
-        val differentLine: (Array[String], Array[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
+        val differentLine: (List[String], List[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
 
         assert(differentLine._1.isEmpty)
         assert(differentLine._2.length == 1)
@@ -88,7 +92,7 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
         assert(differentFile.get.length == 1)
         assert(differentFile.get.head._1.path == root.relativize("READMES.md".toFile).toString )
 
-        val differentLine: (Array[String], Array[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
+        val differentLine: (List[String], List[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
 
         assert(differentLine._1.length == 1)
         assert(differentLine._2.isEmpty)
@@ -99,10 +103,13 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
       //add the first versionof READMES.md file
       AddCommand.addAccordingTypeArg(Seq("READMES.md", "READMEBIS.md"))
       CommitCommand.commit("commit first version")
-      val _: File = ("READMES.md")
+      val _: File = ("READMEBIS.md")
         .toFile
         .overwrite("")
-        .appendLine("Rewrite a line.")
+        .appendLine("Test file.")
+        .appendLine("Second line changes.")
+        .appendLine("Third line.")
+        .appendLine("Fourth line changes.")
 
       //working directory files
       val workingDirectory: Seq[File] = RepoSearching.searchAllDirectoryFile(".sgit/").filterNot(f => f.isDirectory)
@@ -118,14 +125,14 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
         val differentFile: Option[Seq[(Blob, Blob)]] = SearchingTools.searchDifferentFileBetweenWDCommit(workingDirectory, commitContent)
 
         assert(differentFile.get.length == 1)
-        assert(differentFile.get.head._1.path == root.relativize("READMES.md".toFile).toString)
+        assert(differentFile.get.head._1.path == root.relativize("READMEBIS.md".toFile).toString)
 
-        val differentLine: (Array[String], Array[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
+        val differentLine: (List[String], List[String]) = DiffCommand.showDifferences(differentFile.get.head._1.content.split("\n"), differentFile.get.head._2.content.split("\n"))
 
-        assert(differentLine._1.length == 1)
-        assert(differentLine._2.length == 1)
-        assert(differentLine._1.toList.head.contains("I am a test file."))
-        assert(differentLine._2.toList.head.contains("Rewrite a line."))
+        assert(differentLine._1.length == 2)
+        assert(differentLine._2.length == 2)
+        assert(differentLine._1.toList.head.contains("Second line."))
+        assert(differentLine._2.toList.head.contains("Second line changes."))
       }
     }
   }

@@ -32,7 +32,7 @@ object Main extends App {
       case "log" => determineOpt(option, "log", None)
       case "branch" => determineOpt(option, "branch", Some(branch))
       case "tag" => TagCommand.newTag(tag)
-       case _=> println("Error, write a good command 2")
+      case _=> println("Error, write a good command!")
     }
   }
 

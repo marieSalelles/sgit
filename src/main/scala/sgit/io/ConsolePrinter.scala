@@ -26,27 +26,19 @@ object ConsolePrinter {
   }
 
   /**
-   * Print a list of String in red in the console.
-   * @param list : list of String
+   * Print a string in red in the console.
+   * @param word : a string
    */
-  @tailrec
-  def displayRedList(list :Seq[String]): Unit = {
-    if (list.nonEmpty){
-      display("\u001B[31m"+ "- " + list.head + "\u001B[0m")
-      displayRedList(list.tail)
-    }
+  def displayRed (word :String): Unit = {
+      println("\u001B[31m"+ "- " + word + "\u001B[0m")
   }
 
   /**
-   * Print a list of String in green in the console.
-   * @param list : list of String
+   * Print a string in green in the console.
+   * @param word : a string
    */
-  @tailrec
-  def displayGreenList(list :Seq[String]): Unit = {
-    if (list.nonEmpty){
-      display("\u001B[32m"+ "+ "  + list.head + "\u001B[0m")
-      displayGreenList(list.tail)
-    }
+  def displayGreen(word :String): Unit = {
+    println("\u001B[32m"+ "+ "  + word + "\u001B[0m")
   }
 
   /**

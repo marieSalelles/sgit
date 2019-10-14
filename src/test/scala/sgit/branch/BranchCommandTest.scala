@@ -46,6 +46,11 @@ describe("If the user write the command sgit branch in the sgit repository.") {
     val displayBranches: String = BranchCommand.newBranch("")
     assert(displayBranches == "Display all the branches.")
   }
+  it("should do nothing if there is no commit.") {
+    val newBranch = BranchCommand.newBranch("test")
+
+    assert(newBranch == "Do a commit before create a new branch.")
+  }
 }
 
 }
