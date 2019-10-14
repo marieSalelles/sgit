@@ -55,9 +55,9 @@ object DiffCommand {
    */
   def showDifferences(commitFileContent: Array[String], wdFileContent: Array[String] ):(Array[String], Array[String]) = {
     val deletedLine: Array[String] = commitFileContent.diff(wdFileContent).distinct.filterNot(dl => dl =="")
-   if(deletedLine.nonEmpty) ConsolePrinter.displayList(deletedLine)
+    if(deletedLine.nonEmpty) ConsolePrinter.displayRedList(deletedLine)
     val addedLine: Array[String] = wdFileContent.diff(commitFileContent).distinct.filterNot(al => al =="")
-    if(addedLine.nonEmpty) ConsolePrinter.displayList(addedLine)
+    if(addedLine.nonEmpty) ConsolePrinter.displayGreenList(addedLine)
     (deletedLine, addedLine)
   }
 }

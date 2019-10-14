@@ -20,8 +20,26 @@ object SearchingTools {
    * @return the sha key of the last commit if it exists.
    */
   def findLastCommit(): Option[String] = {
-    val currentBranch = ReadFile.readHEAD()
+    val currentBranch: String = ReadFile.readHEAD()
     ReadFile.readHeads(currentBranch)
+  }
+
+  /**
+   * Search if the branch exists
+   * @param branchName : branch name
+   * @return true if the branch exists
+   */
+  def searchBranch(branchName: String): Boolean= {
+    (".sgit/refs/heads/" + branchName).toFile.exists
+  }
+
+  /**
+   * Retrieve all the branch with it name and last commit
+   * @return a list of branch names and content (last commit on this branch)
+   */
+  def searchAllBranch(): Seq[(String, String)] = {
+    val allBranchFile: Seq[File] = ".sgit/refs/heads/".toFile.children.toList
+    allBranchFile.map(branch => (branch.name, branch.contentAsString))
   }
 
   /**

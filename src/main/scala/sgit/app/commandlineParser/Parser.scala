@@ -47,6 +47,18 @@ object Parser {
             .action((_, c) => c.copy(option = "stat"))
             .text("Generate a diffstat.")
         ),
+      cmd("branch")
+          .action((_,c)=>c.copy(command = "branch"))
+          .text("Create a new branch.")
+          .children(
+            arg[String]("branch name")
+                .action((x, c) => c.copy(branch = x))
+                .text("branch name"),
+            opt[Unit]("av")
+              .abbr("av")
+              .action((_,c)=> c.copy(option = "av"))
+              .text("List all existing branches and tags.")
+          ),
         checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")

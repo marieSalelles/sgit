@@ -12,7 +12,7 @@ object WriteFile {
    * @param name : branch name
    */
   def writeHead(name :String) = {
-    val _: File = ".sgit/HEAD".toFile.append("refs/heads/master")
+    val _: File = ".sgit/HEAD".toFile.overwrite("refs/heads/"+ name)
   }
 
   /**
@@ -41,15 +41,6 @@ object WriteFile {
    */
   def clearStaged() :Unit = {
     ".sgit/staged".toFile.overwrite("")
-  }
-
-  /**
-   * Rewrite in the heads folder the file of the current branch
-   * @param branch the current branch
-   * @param commit the new commit
-   */
-  def writeHeadsFile(branch: String, commit: String):Unit = {
-    (".sgit/"+branch).toFile.createIfNotExists().overwrite(commit)
   }
 
   /**

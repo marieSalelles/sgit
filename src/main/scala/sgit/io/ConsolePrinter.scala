@@ -20,8 +20,32 @@ object ConsolePrinter {
   @tailrec
   def displayList(list :Seq[String]): Unit = {
     if(list.nonEmpty) {
-      println(list.head)
+      display(list.head)
       displayList(list.tail)
+    }
+  }
+
+  /**
+   * Print a list of String in red in the console.
+   * @param list : list of String
+   */
+  @tailrec
+  def displayRedList(list :Seq[String]): Unit = {
+    if (list.nonEmpty){
+      display("\u001B[31m"+ "- " + list.head + "\u001B[0m")
+      displayRedList(list.tail)
+    }
+  }
+
+  /**
+   * Print a list of String in green in the console.
+   * @param list : list of String
+   */
+  @tailrec
+  def displayGreenList(list :Seq[String]): Unit = {
+    if (list.nonEmpty){
+      display("\u001B[32m"+ "+ "  + list.head + "\u001B[0m")
+      displayGreenList(list.tail)
     }
   }
 

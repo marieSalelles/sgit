@@ -27,6 +27,15 @@ object CreateFile {
   }
 
   /**
+   * Rewrite in the heads folder the file of the current branch
+   * @param branch the current branch
+   * @param commit the new commit
+   */
+  def writeHeadsFile(branch: String, commit: String):Unit = {
+    (".sgit/"+branch).toFile.createIfNotExists().overwrite(commit)
+  }
+
+  /**
    * Create a commit file.
    * @param parents parents of the new commit
    * @return the sha key of the commit file

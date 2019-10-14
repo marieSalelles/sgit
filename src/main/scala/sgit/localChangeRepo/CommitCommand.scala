@@ -30,7 +30,7 @@ object CommitCommand {
           //create the commit file with the new files newContent and the file untracked) and the old ones
           val newCommit: String = CreateFile.createCommit((lastCommit.get, ""), newContent.concat(filesToWrite).distinct, message)
           // write the new commit on the current ranch file
-          WriteFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
+          CreateFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
           //clear the staged file
           WriteFile.clearStaged()
           ConsolePrinter.display("Succes, the commit is created.")
@@ -39,7 +39,7 @@ object CommitCommand {
           //create the commit file and object
           val newCommit: String = CreateFile.createCommit(("", ""), filesToWrite, message)
           // write the new commit on the current branch file
-          WriteFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
+          CreateFile.writeHeadsFile(ReadFile.readHEAD(), newCommit)
           //clear the staged file
           WriteFile.clearStaged()
           ConsolePrinter.display("Succes, the commit is created.")
