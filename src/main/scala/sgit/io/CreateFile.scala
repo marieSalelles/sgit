@@ -27,12 +27,21 @@ object CreateFile {
   }
 
   /**
-   * Rewrite in the heads folder the file of the current branch
+   * (Re)write in the heads folder the file of the current branch
    * @param branch the current branch
    * @param commit the new commit
    */
   def writeHeadsFile(branch: String, commit: String):Unit = {
     (".sgit/"+branch).toFile.createIfNotExists().overwrite(commit)
+  }
+
+  /**
+   * Write a tag file in the tags folder.
+   * @param tag : tag name
+   * @param commit : commit sha
+   */
+  def writeTagsFile(tag: String, commit: String): Unit = {
+    (".sgit/"+ tag).toFile.createIfNotExists().overwrite(commit)
   }
 
   /**

@@ -34,12 +34,31 @@ object SearchingTools {
   }
 
   /**
-   * Retrieve all the branch with it name and last commit
+   * Retrieve all the branches with it name and last commit
    * @return a list of branch names and content (last commit on this branch)
    */
-  def searchAllBranch(): Seq[(String, String)] = {
-    val allBranchFile: Seq[File] = ".sgit/refs/heads/".toFile.children.toList
-    allBranchFile.map(branch => (branch.name, branch.contentAsString))
+  def searchAllBranches(): Seq[(String, String)] = {
+    val allBranchFiles: Seq[File] = ".sgit/refs/heads/".toFile.children.toList
+    allBranchFiles.map(branch => (branch.name, branch.contentAsString))
+  }
+
+  /**
+   * Search if the tag exists
+   * @param tagName : tag name
+   * @return true if the tag exists
+   */
+  def searchTag(tagName: String): Boolean = {
+    (".sgit/refs/tags/" + tagName).toFile.exists
+  }
+
+  /**
+   * Retrieve all the tags with it name and it commit
+   * @return a list of tag names and content (commit)
+   */
+  def searchAllTags(): Option[Seq[(String, String)]] = {
+    val allTagFiles: Seq[File] = ".sgit/refs/tags/".toFile.children.toList
+    if (allTagFiles.nonEmpty) Some(allTagFiles.map(tag => (tag.name, tag.contentAsString)))
+    else None
   }
 
   /**

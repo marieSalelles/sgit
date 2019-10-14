@@ -37,6 +37,15 @@ describe("If the user write the command sgit branch in the sgit repository.") {
     val sameNewBranch = BranchCommand.newBranch("test")
     assert(sameNewBranch == "The branch already exists.")
   }
+  it("should display all the branches if the user doesn't put an argument.") {
+    AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
+    CommitCommand.commit("First commit")
+
+    BranchCommand.newBranch("test")
+
+    val displayBranches: String = BranchCommand.newBranch("")
+    assert(displayBranches == "Display all the branches.")
+  }
 }
 
 }

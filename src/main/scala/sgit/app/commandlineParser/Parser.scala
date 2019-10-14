@@ -59,6 +59,14 @@ object Parser {
               .action((_,c)=> c.copy(option = "av"))
               .text("List all existing branches and tags.")
           ),
+      cmd("tag")
+          .action((_,c) => c.copy(command = "tag"))
+          .text("Create a tag.")
+          .children(
+            arg[String]("tag name")
+              .action((x,c)=> c.copy(tag = x))
+              .text("tag name")
+          ),
         checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")
