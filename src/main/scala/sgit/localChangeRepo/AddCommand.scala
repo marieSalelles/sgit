@@ -40,7 +40,7 @@ object AddCommand {
             ConsolePrinter.display("Success, the files have been added.")
           } else {
             //Search file in the user repo
-            val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head.r)
+            val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head)
             //Remove the files that are not modify
             val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
             //Create files in objects directory

@@ -29,16 +29,16 @@ object ConsolePrinter {
    * Print a string in red in the console.
    * @param word : a string
    */
-  def displayRed (word :String): Unit = {
-      println("\u001B[31m"+ "- " + word + "\u001B[0m")
+  def displayRed (index: String, word :String): Unit = {
+      println("\u001B[31m"+ "- " + index + " " + word + "\u001B[0m")
   }
 
   /**
    * Print a string in green in the console.
    * @param word : a string
    */
-  def displayGreen(word :String): Unit = {
-    println("\u001B[32m"+ "+ "  + word + "\u001B[0m")
+  def displayGreen (index:String, word :String): Unit = {
+    println("\u001B[32m"+ "+ " + index + " " + word + "\u001B[0m")
   }
 
   /**

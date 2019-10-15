@@ -27,9 +27,12 @@ object DiffCommand {
 
         if (fileWithDifference.nonEmpty) {
           fileWithDifference.get.map(f =>  {
-            ConsolePrinter.display(f._1.path)
-            showDifferences(f._1.content.replace("\r","").split("\n"),
-              f._2.content.replace("\r","").split("\n"))
+            //check if the content of the file is not the same in the 2 versions.
+            if(f._1.content != f._2.content) {
+              ConsolePrinter.display(f._1.path)
+              showDifferences(f._1.content.replace("\r","").split("\n"),
+                f._2.content.replace("\r","").split("\n"))
+            }
           })
           true
         } else {
@@ -75,16 +78,16 @@ object DiffCommand {
   def printDiffLine(addedLine: Seq[(String, Int)], deletedLine: Seq[(String, Int)]): Unit = {
     if (deletedLine.nonEmpty || addedLine.nonEmpty){
       if (addedLine.isEmpty){
-        ConsolePrinter.displayRed(deletedLine.head._1)
+        ConsolePrinter.displayRed(deletedLine.head._2.toString, deletedLine.head._1)
         printDiffLine(Seq(), deletedLine.tail)
       } else if (deletedLine.isEmpty){
-        ConsolePrinter.displayGreen(addedLine.head._1)
+        ConsolePrinter.displayGreen(addedLine.head._2.toString ,addedLine.head._1)
         printDiffLine(addedLine.tail,Seq())
       } else if (deletedLine.head._2 <= addedLine.head._2){
-        ConsolePrinter.displayRed(deletedLine.head._1)
+        ConsolePrinter.displayRed(deletedLine.head._2.toString, deletedLine.head._1)
         printDiffLine(addedLine, deletedLine.tail)
       } else if(deletedLine.head._2 > addedLine.head._2) {
-        ConsolePrinter.displayGreen(addedLine.head._1)
+        ConsolePrinter.displayGreen(addedLine.head._2.toString, addedLine.head._1)
         printDiffLine(addedLine.tail, deletedLine)
       }
     }

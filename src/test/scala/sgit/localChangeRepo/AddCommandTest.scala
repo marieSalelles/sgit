@@ -11,25 +11,25 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
   before {
     InitCommand.createTreeView()
     val repo :File = ".sgit/".toFile.parent
-    val _: File=  (repo + "/" + "READMES.md")
+    val _: File=  (repo + "/" + "READMES.c")
       .toFile
       .createIfNotExists()
-    val _: File=  (repo + "/" + "READMEBIS.md")
+    val _: File=  (repo + "/" + "READMEBIS.c")
       .toFile
       .createIfNotExists()
   }
   after {
     if(".sgit/".toFile.exists) ".sgit".toFile.delete()
-    if("READMES.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMES.md".toFile.delete()
-    if("READMEBIS.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
+    if("READMES.c".toFile.exists) ".sgit/".toFile.parent + "/" + "READMES.c".toFile.delete()
+    if("READMEBIS.c".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.c".toFile.delete()
   }
 
   describe("If the user write the command sgit add <args> in the sgit repository."){
     it("should correspond to the regex is/are added to the staged file.") {
-        val regexarg = List("[A-Za-z]*R[a-zA-Z]*.[a-z]*")
+        val regexarg = List("*.c")
         AddCommand.addAccordingTypeArg(regexarg)
         //search the file corresponding to the regex in the user repo
-        val fileInUserRepo = RepoSearching.searchDirectoryFile("[A-Za-z]*R[a-zA-Z]*.[a-z]*".r)
+        val fileInUserRepo = RepoSearching.searchDirectoryFile("*.c")
         val files = fileInUserRepo.filterNot(f => f.isDirectory)
         //generate sha key to files
         val shakeys = files.map(f => (f.sha1 + " " + ".sgit/".toFile.parent.relativize(f).toString))
@@ -37,11 +37,13 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
         val contentFile = ".sgit/staged".toFile.contentAsString
           .replace("\r", "")
           .split("\n").toList
+
+        assert(fileInUserRepo.map(f => f.name) == List("READMEBIS.c", "READMES.c"))
         assert(contentFile == shakeys)
 
     }
     it("should correspond to the name(s) given in by the user is/are added into the staged file."){
-      val files :Seq[String] = Seq("READMES.md", "READMEBIS.md")
+      val files :Seq[String] = Seq("READMES.c", "READMEBIS.c")
       AddCommand.addAccordingTypeArg(files)
 
       //search the file corresponding to the regex in the user repo
@@ -53,6 +55,8 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       val contentFile = ".sgit/staged".toFile.contentAsString
         .replace("\r", "")
         .split("\n").toList
+
+      assert(foundFile.map(f => f.name) == List("READMES.c", "READMEBIS.c"))
       assert(contentFile == shakeys)
     }
     it(" should add all the files in the repository in the staged file.") {
@@ -67,6 +71,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       val contentFile = ".sgit/staged".toFile.contentAsString
         .replace("\r", "")
         .split("\n").toList
+
       assert(contentFile == shakeys)
     }
   }

@@ -191,12 +191,55 @@ object SearchingTools {
    * @param wdFiles : working directory files
    * @return a tuple of blobs with in first the file contains in the commit and in second the file contains in the working directory
    */
-  def retrieveFilesWDCommit(path: String, commitContent: Seq[StagedLine], wdFiles: Seq[File]): Option[(Blob,Blob)] = {
+  /*def retrieveFilesWDCommit(path: String, commitContent: Seq[StagedLine], wdFiles: Seq[File]): Option[(Blob,Blob)] = {
+    //retrieve the file in the commit
     val sameFileCommit: Seq[StagedLine] = commitContent.filter(cf => cf.path == path)
+
     if (sameFileCommit.nonEmpty) {
       val root = ".sgit/".toFile.parent
+      //retrieve the file in the working directory
       val sameFileWD: Seq[File] = wdFiles.filter(wdf => root.relativize(wdf).toString == path)
       if(sameFileWD.nonEmpty){
+        //retrieve the content of the commit file version
+        val contentCommitFile = ReadFile.readBlobContent(sameFileCommit.head.sha)
+        Some((Blob(sameFileCommit.head.sha, contentCommitFile, sameFileCommit.head.path),
+          Blob(sameFileWD.head.sha1, sameFileWD.head.contentAsString, root.relativize(sameFileWD.head).toString)))
+      } else None
+    } else None
+  }*/
+
+  def retrieveFilesWDCommit(path: String, commitContent: Seq[StagedLine], wdFiles: Seq[File]): Option[(Blob,Blob)] = {
+    //retrive the file in the commit
+    val sameFileCommit: Seq[StagedLine] = commitContent.filter(cf => cf.path == path)
+
+    def retrieveFileInStagedWithPath(path: String): Option[Seq[StagedLine]]= {
+      ///retrieve the staged file content
+      val stagedContent: Option[List[StagedLine]] = ReadFile.readStaged()
+      //search if the file is add by the user (in the staged file)
+      if(stagedContent.isDefined) {
+        val file = stagedContent.get.filter(sf => sf.path == path)
+        if (file.nonEmpty) Some(file)
+        else None
+      } else None
+    }
+
+    val fileInStaged: Option[Seq[StagedLine]] = retrieveFileInStagedWithPath(path)
+    if(fileInStaged.isDefined && fileInStaged.get.nonEmpty){
+      val root = ".sgit/".toFile.parent
+      //retrieve the file in the working directory
+      val sameFileWD: Seq[File] = wdFiles.filter(wdf => root.relativize(wdf).toString == path)
+      if(sameFileWD.nonEmpty){
+        //retrieve the content of the commit file version
+        val contentStagedFile = ReadFile.readBlobContent(fileInStaged.get.head.sha)
+        Some((Blob(fileInStaged.get.head.sha, contentStagedFile, fileInStaged.get.head.path),
+          Blob(sameFileWD.head.sha1, sameFileWD.head.contentAsString, root.relativize(sameFileWD.head).toString)))
+      } else None
+    } else if (sameFileCommit.nonEmpty) {
+      val root = ".sgit/".toFile.parent
+      //retrieve the file in the working directory
+      val sameFileWD: Seq[File] = wdFiles.filter(wdf => root.relativize(wdf).toString == path)
+      if(sameFileWD.nonEmpty){
+        //retrieve the content of the commit file version
         val contentCommitFile = ReadFile.readBlobContent(sameFileCommit.head.sha)
         Some((Blob(sameFileCommit.head.sha, contentCommitFile, sameFileCommit.head.path),
           Blob(sameFileWD.head.sha1, sameFileWD.head.contentAsString, root.relativize(sameFileWD.head).toString)))
@@ -204,10 +247,11 @@ object SearchingTools {
     } else None
   }
 
+
   /**
-   * Search all the folder in a path
+   * Search all the folders and files with a path
    * @param paths : sequence of file path
-   * @param allFiles : all the files and folders
+   * @param allFiles : all the retrieved files and folders
    * @return all the files and folders
    */
   @tailrec
@@ -222,6 +266,7 @@ object SearchingTools {
     }
     else retrieveFoldersWithPath(paths.tail, allFiles)
   }
+
 
   /**
    * Search folder children in a sequence of folders/files
