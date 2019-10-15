@@ -67,7 +67,35 @@ object Parser {
               .action((x,c)=> c.copy(tag = x))
               .text("tag name")
           ),
-        checkConfig(
+      cmd("checkout")
+          .action((_,c)=> c.copy(command="checkout"))
+          .text("Switch branches or restore working tree files")
+      .children(
+        arg[String]("Branch or tag or commit hash")
+          .action((x,c)=>c.copy(checkout = x))
+          .text("Branch or tag or commit hash")
+      ),
+      cmd("merge")
+        .action((_,c)=> c.copy(command="merge"))
+        .text("Join two or more development histories together.")
+      .children(
+        arg[String]("Branch")
+          .action((x,c)=>c.copy(merge = x))
+          .text("Branch name.")
+      ),
+      cmd("rebase")
+      .action((_,c)=>c.copy(command="rebase"))
+      .text("Reapply commits on top of another base tip")
+      .children(
+        arg[String]("Commit hash or branch name")
+          .action((x,c)=> c.copy(rebase = x))
+          .text("Commit hash or branch name"),
+        opt[Unit]("interactive")
+          .abbr("i")
+          .action((_,c)=> c.copy(option = "i"))
+          .text("Make a list of the commits which are about to be rebased. Let the user edit that list before rebasing.")
+      ),
+      checkConfig(
         c =>
           if (c.command == "") failure("Write a command.")
           else success)

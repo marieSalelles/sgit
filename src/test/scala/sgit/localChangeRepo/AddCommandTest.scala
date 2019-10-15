@@ -11,25 +11,29 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
   before {
     InitCommand.createTreeView()
     val repo :File = ".sgit/".toFile.parent
-    val _: File=  (repo + "/" + "READMES.c")
+    val folder: File = ("test/")
+      .toFile
+      .createIfNotExists(true,false)
+    val _: File=  (repo + "/" + "test/READMES.c")
       .toFile
       .createIfNotExists()
-    val _: File=  (repo + "/" + "READMEBIS.c")
+    val _: File=  (repo + "/" + "test/READMEBIS.c")
       .toFile
       .createIfNotExists()
   }
   after {
     if(".sgit/".toFile.exists) ".sgit".toFile.delete()
+    if("test/".toFile.exists) "test".toFile.delete()
     if("READMES.c".toFile.exists) ".sgit/".toFile.parent + "/" + "READMES.c".toFile.delete()
     if("READMEBIS.c".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.c".toFile.delete()
   }
 
   describe("If the user write the command sgit add <args> in the sgit repository."){
     it("should correspond to the regex is/are added to the staged file.") {
-        val regexarg = List("*.c")
+        val regexarg = List("test/*.c")
         AddCommand.addAccordingTypeArg(regexarg)
         //search the file corresponding to the regex in the user repo
-        val fileInUserRepo = RepoSearching.searchDirectoryFile("*.c")
+        val fileInUserRepo = RepoSearching.searchDirectoryFile("test/*.c")
         val files = fileInUserRepo.filterNot(f => f.isDirectory)
         //generate sha key to files
         val shakeys = files.map(f => (f.sha1 + " " + ".sgit/".toFile.parent.relativize(f).toString))
@@ -43,7 +47,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
 
     }
     it("should correspond to the name(s) given in by the user is/are added into the staged file."){
-      val files :Seq[String] = Seq("READMES.c", "READMEBIS.c")
+      val files :Seq[String] = Seq("test/READMES.c", "test/READMEBIS.c")
       AddCommand.addAccordingTypeArg(files)
 
       //search the file corresponding to the regex in the user repo
@@ -64,6 +68,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
       AddCommand.addAccordingTypeArg(args)
 
       val files = RepoSearching.searchAllDirectoryFile(".sgit/")
+      print("files: " +files)
       //generate sha key to files
       val files2 = files.filterNot(f => f.isDirectory)
       val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))

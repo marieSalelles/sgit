@@ -12,7 +12,7 @@ object Main extends App {
   /** Check if the user write a command.
     */
   OParser.parse(Parser.parser1, args, Config()) match {
-    case Some(config) => determineMode(config.command, config.option, config.files, config.message, config.branch, config.tag)
+    case Some(config) => determineMode(config.command, config.option, config.files, config.message, config.branch, config.tag, config.checkout, config.merge, config.rebase)
     case None => println("")
   }
 
@@ -22,7 +22,7 @@ object Main extends App {
    * @param option : command option
    * @param files : files argument
    */
-  def determineMode(command: String, option: String, files: Seq[String], message: String, branch: String, tag: String): Unit = {
+  def determineMode(command: String, option: String, files: Seq[String], message: String, branch: String, tag: String, checkout: String, merge: String, rebase: String): Unit = {
     command match {
       case "init" => InitCommand.createTreeView()
       case "status" => StatusCommand.statusFile()
@@ -32,6 +32,9 @@ object Main extends App {
       case "log" => determineOpt(option, "log", None)
       case "branch" => determineOpt(option, "branch", Some(branch))
       case "tag" => TagCommand.newTag(tag)
+      case "checkout" => println("checkout")
+      case "merge" => println("merge")
+      case "rebase" => println("rebase")
       case _=> println("Error, write a good command!")
     }
   }

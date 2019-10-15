@@ -7,5 +7,8 @@ case class Config (command: String = "",
                    files: Seq[String] = Seq(),
                    message: String = "",
                    branch: String = "",
-                   tag: String =""
+                   tag: String ="",
+                   checkout: String ="",
+                   merge: String ="",
+                   rebase: String=""
                   ){}
