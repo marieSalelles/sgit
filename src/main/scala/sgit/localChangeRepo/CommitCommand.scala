@@ -4,7 +4,11 @@ import sgit.io.{ConsolePrinter, CreateFile, ReadFile, SearchingTools, WriteFile}
 import sgit.objects.StagedLine
 
 object CommitCommand {
-
+  /**
+   * Create a commit
+   * @param message : commit message
+   * @return the commit sha key
+   */
   def commit(message: String): Option[String] = {
     if(SearchingTools.searchSgitFolder()) {
       //retrieve the last commit

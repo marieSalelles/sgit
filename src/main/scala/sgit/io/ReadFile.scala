@@ -51,11 +51,11 @@ object ReadFile {
 
   /**
    * Read the content of a commit file.
-   * @param lastCommit : the sha key of a commit file
+   * @param commit : the sha key of a commit file
    * @return the list of the files commit
    */
-  def readCommit(lastCommit :String) :List[StagedLine] = {
-    val line :List[String] = (".sgit/objects/"+lastCommit).toFile.contentAsString
+  def readCommit(commit :String) :List[StagedLine] = {
+    val line :List[String] = (".sgit/objects/"+commit).toFile.contentAsString
       .replace("\r","")
       .split("\n").toList
     val contentWithoutParents = line.tail

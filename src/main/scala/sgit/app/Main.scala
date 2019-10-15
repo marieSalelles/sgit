@@ -50,7 +50,7 @@ object Main extends App {
     else if (command =="branch") {
       opt match {
         case "" => BranchCommand.newBranch(arg.get)
-        case "av" => println("branch -av")
+        case "av" => BranchCommand.VerboseBranch()
       }
     }
   }

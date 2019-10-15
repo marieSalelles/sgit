@@ -2,6 +2,7 @@ package sgit.branch
 
 import sgit.io
 import sgit.io.{ConsolePrinter, CreateFile, ReadFile, SearchingTools, WriteFile}
+import sgit.objects.{Commit, StagedLine}
 
 object BranchCommand {
 
@@ -40,6 +41,25 @@ object BranchCommand {
       ConsolePrinter.display("Do an sgit init.")
       "Do an sgit init."
     }
+  }
+
+  /**
+   * Display the list of all branch with their last commmit (commit sha and message)
+   * @return the list of the branches with their commit infos
+   */
+  def VerboseBranch(): Option[Seq[String]] = {
+    if(SearchingTools.searchSgitFolder()) {
+      val allBranches: Seq[(String, String)] = SearchingTools.searchAllBranches()
+
+      val branchesList: Seq[String] = allBranches.map(branch => {
+        //retrieve commit content
+        val commitContent: Option[Commit] = ReadFile.readCommitProperties(Some(branch._2))
+        val commitMessage = commitContent.get.message
+        ConsolePrinter.display( branch._1 + " " + branch._2 + " " + commitMessage)
+        branch._1 + " " + branch._2 + " " + commitMessage
+      })
+      Some(branchesList)
+    } else None
   }
 
 }
