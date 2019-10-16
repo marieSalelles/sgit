@@ -3,7 +3,9 @@ package sgit.io
 import java.nio.file.{Files, Paths}
 
 import better.files._
-import sgit.objects.{Commit, StagedLine}
+import sgit.objects.{Blob, Commit, StagedLine}
+
+import scala.annotation.tailrec
 
 object ReadFile {
 
@@ -84,6 +86,24 @@ object ReadFile {
   }
 
   /**
+   * Read the content of a branch file
+   * @param branch : branch file path
+   * @return the commit sha key
+   */
+  def readBranchCommit(branch: String): String = {
+    (".sgit/"+branch).toFile.contentAsString
+  }
+
+  /**
+   * Read the content of a tag file
+   * @param tag : tag file path
+   * @return the commit sha key
+   */
+  def readTagCommit(tag: String): String = {
+    (".sgit/"+tag).toFile.contentAsString
+  }
+
+  /**
    * Rerieve all the commit properties and create a commit object.
    * @param commit commit sha key
    * @return a commit object
@@ -103,5 +123,24 @@ object ReadFile {
       })
       Some(Commit(commit.get, commitFile.lastModifiedTime, parents, allFileElement, message))
     } else None
+  }
+
+  /**
+   * Build blob object with the reading of the blob file retrieves by the sha key
+   * @param files : file list
+   * @param blobs : sequence of built blobs
+   * @return the list of blobs
+   */
+  @tailrec
+  def readBlobFile(files: Seq[StagedLine],blobs: Seq[Blob]): Seq[Blob]= {
+    if (files.isEmpty) blobs
+    else {
+      val file: StagedLine = files.head
+      val fileContent: String = (".sgit/objects/" + file.sha).toFile
+        .contentAsString
+        .replace("\r", "")
+
+      readBlobFile(files.tail, blobs:+Blob(file.sha,fileContent.substring(fileContent.indexOf("\n")), file.path ))
+    }
   }
 }

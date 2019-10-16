@@ -15,7 +15,10 @@ object BranchCommand {
     if(SearchingTools.searchSgitFolder()) {
       if(name == "") {
         val allBranches: Seq[(String, String)] = SearchingTools.searchAllBranches()
-        ConsolePrinter.displayList(allBranches.map(branch => branch._1))
+        val currentBranch: String = ReadFile.readHEAD().replace("\\", "/").split("/").last
+        val otherBranches = allBranches.filterNot(b => b._1 == currentBranch)
+        ConsolePrinter.displayCurrentBranch(currentBranch)
+        ConsolePrinter.displayList(otherBranches.map(branch => branch._1))
         "Display all the branches."
         //search if the branch already exists
       } else if (!SearchingTools.searchBranch(name)) {
@@ -50,12 +53,16 @@ object BranchCommand {
   def VerboseBranch(): Option[Seq[String]] = {
     if(SearchingTools.searchSgitFolder()) {
       val allBranches: Seq[(String, String)] = SearchingTools.searchAllBranches()
+      val currentBranch: String = ReadFile.readHEAD().replace("\\", "/").split("/").last
 
       val branchesList: Seq[String] = allBranches.map(branch => {
         //retrieve commit content
         val commitContent: Option[Commit] = ReadFile.readCommitProperties(Some(branch._2))
         val commitMessage = commitContent.get.message
-        ConsolePrinter.display( branch._1 + " " + branch._2 + " " + commitMessage)
+        //display branch in green if it is the current branch in white for the other
+        if (branch._1 == currentBranch) ConsolePrinter.displayCurrentBranch( branch._1 + " " + branch._2 + " " + commitMessage)
+        else ConsolePrinter.display( branch._1 + " " + branch._2 + " " + commitMessage)
+
         branch._1 + " " + branch._2 + " " + commitMessage
       })
       Some(branchesList)

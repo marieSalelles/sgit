@@ -2,7 +2,7 @@ package sgit.app
 
 import scopt.OParser
 import sgit.app.commandlineParser._
-import sgit.branch.{BranchCommand, TagCommand}
+import sgit.branch.{BranchCommand, CheckoutCommand, TagCommand}
 import sgit.commitHistory.LogCommand
 import sgit.createRepo._
 import sgit.localChangeRepo._
@@ -32,7 +32,7 @@ object Main extends App {
       case "log" => determineOpt(option, "log", None)
       case "branch" => determineOpt(option, "branch", Some(branch))
       case "tag" => TagCommand.newTag(tag)
-      case "checkout" => println("checkout")
+      case "checkout" => CheckoutCommand.checkout(checkout)
       case "merge" => println("merge")
       case "rebase" => println("rebase")
       case _=> println("Error, write a good command!")

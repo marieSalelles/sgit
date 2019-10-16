@@ -62,6 +62,15 @@ object SearchingTools {
   }
 
   /**
+   * Search if the commit exists
+   * @param commitSha : commit sha key
+   * @return true if the commit exists
+   */
+  def searchCommit(commitSha: String): Boolean = {
+    (".sgit/objects/" + commitSha).toFile.exists
+  }
+
+  /**
    * Search the untracked files (it are not in the objects directory).
    * @param workingDirectory : the working directory folders and files
    * @return all the untracked files path

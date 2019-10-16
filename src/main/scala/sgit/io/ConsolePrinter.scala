@@ -41,6 +41,9 @@ object ConsolePrinter {
     println("\u001B[32m"+ "+ " + index + " " + word + "\u001B[0m")
   }
 
+  def displayCurrentBranch(branch: String): Unit ={
+    println("\u001B[32m"+ "* "+ branch + "\u001B[0m")
+  }
   /**
    * Print the status states
    * @param state : state : Changes to be committed ou not stage for commit
