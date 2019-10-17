@@ -2,7 +2,7 @@ package sgit.app
 
 import scopt.OParser
 import sgit.app.commandlineParser._
-import sgit.branch.{BranchCommand, CheckoutCommand, TagCommand}
+import sgit.refsOperation._
 import sgit.commitHistory.LogCommand
 import sgit.createRepo._
 import sgit.localChangeRepo._
@@ -20,7 +20,13 @@ object Main extends App {
    * Dispatch according to the command written by the user
    * @param command : written command
    * @param option : command option
-   * @param files : files argument
+   * @param files : files argument given with the add command
+   * @param message : commit argument
+   * @param branch : branch argument
+   * @param tag : tag argument
+   * @param checkout : checkout argument
+   * @param merge : merge argument
+   * @param rebase : rebase argument
    */
   def determineMode(command: String, option: String, files: Seq[String], message: String, branch: String, tag: String, checkout: String, merge: String, rebase: String): Unit = {
     command match {
@@ -39,6 +45,12 @@ object Main extends App {
     }
   }
 
+  /**
+   * Dispatch according to the option given after the command.
+   * @param opt: option
+   * @param command: command
+   * @param arg: argument
+   */
   def determineOpt(opt: String, command: String, arg: Option[String]){
     if (command == "log") {
       opt match {
@@ -49,8 +61,8 @@ object Main extends App {
     }
     else if (command =="branch") {
       opt match {
+        case "v" => BranchCommand.VerboseBranch()
         case "" => BranchCommand.newBranch(arg.get)
-        case "av" => BranchCommand.VerboseBranch()
       }
     }
   }

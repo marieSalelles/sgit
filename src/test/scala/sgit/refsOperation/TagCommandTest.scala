@@ -1,4 +1,4 @@
-package sgit.branch
+package sgit.refsOperation
 
 import better.files.File
 import org.scalatest.{BeforeAndAfter, FunSpec}

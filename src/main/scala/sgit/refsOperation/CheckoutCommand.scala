@@ -1,7 +1,7 @@
-package sgit.branch
+package sgit.refsOperation
 
 import sgit.io.{ConsolePrinter, CreateRepository, ReadFile, SearchingTools, WriteFile}
-import sgit.objects.{Blob, Commit, StagedLine}
+import sgit.objects.{Blob, StagedLine}
 
 object CheckoutCommand {
 

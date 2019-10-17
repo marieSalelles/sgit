@@ -1,10 +1,10 @@
 package sgit.app.commandlineParser
 
-import scopt.OParser
+import scopt.{OParser, OParserBuilder}
 
 object Parser {
-  val builder = OParser.builder[Config]
-  val parser1 = {
+  val builder: OParserBuilder[Config] = OParser.builder[Config]
+  val parser1: OParser[Unit, Config] = {
     import builder._
     OParser.sequence(
       programName("sgit"),
@@ -39,7 +39,7 @@ object Parser {
           .action((_,c)=> c.copy(command = "log"))
           .text("Show commit logs.")
         .children(
-          opt[Unit]("p")
+          opt[Unit]("full diff")
             .abbr("p")
             .action((_, c) => c.copy(option = "p"))
             .text("Shows the changes over time."),
@@ -52,18 +52,20 @@ object Parser {
           .text("Create a new branch.")
           .children(
             arg[String]("branch name")
+                .optional
                 .action((x, c) => c.copy(branch = x))
                 .text("branch name"),
-            opt[Unit]("av")
-              .abbr("av")
-              .action((_,c)=> c.copy(option = "av"))
-              .text("List all existing branches and tags.")
+            opt[Unit]("verbose")
+              .abbr("v")
+              .action((_,c)=> c.copy(option = "v"))
+              .text("List all existing branches.")
           ),
       cmd("tag")
           .action((_,c) => c.copy(command = "tag"))
           .text("Create a tag.")
           .children(
             arg[String]("tag name")
+              .optional
               .action((x,c)=> c.copy(tag = x))
               .text("tag name")
           ),

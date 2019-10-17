@@ -1,8 +1,6 @@
 package sgit.io
 
 import better.files._
-import java.nio.file.{Files, Paths}
-
 import sgit.objects.Blob
 
 object CreateRepository {
@@ -11,9 +9,9 @@ object CreateRepository {
    * Create the tree view of the sgit repository if .sgit not already exist.
    * @return the state of the repository creation
    */
-  def initialisation() :Boolean ={
+  def initialisation() :Boolean = {
     try {
-      if (!Files.exists(Paths.get(".sgit"))) {
+      if (!(".sgit".toFile.exists)) {
         createDirectory(true, ".sgit")
         createDirectory(false, ".sgit/HEAD")
         createDirectory(true, ".sgit/objects")
@@ -37,7 +35,7 @@ object CreateRepository {
    */
   def createDirectory(isFolder :Boolean, nameF: String): Boolean= {
     try {
-      val dir: File = nameF
+      val _: File = nameF
         .toFile
         .createIfNotExists(isFolder,createParents = false)
       true
@@ -55,7 +53,7 @@ object CreateRepository {
   def builtRepository(blob: Blob): Unit = {
     val _: File =  blob.path.toFile
       .createIfNotExists( asDirectory = false, createParents = true)
-      .overwrite(blob.content)
+      .overwrite(blob.content.substring(1))
   }
 
 }

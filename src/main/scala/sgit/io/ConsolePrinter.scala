@@ -1,13 +1,12 @@
 package sgit.io
 
 import java.util.Date
-
 import scala.annotation.tailrec
 
 object ConsolePrinter {
   /**
    * Print in the console
-   * @param message the message to print
+   * @param message: the message to print
    */
   def display(message: String) :Unit = {
     println(message)
@@ -41,13 +40,18 @@ object ConsolePrinter {
     println("\u001B[32m"+ "+ " + index + " " + word + "\u001B[0m")
   }
 
-  def displayCurrentBranch(branch: String): Unit ={
+  /**
+   * Print the current branch in green in the console.
+   * @param branch: branch name
+   */
+  def displayCurrentBranch(branch: String): Unit = {
     println("\u001B[32m"+ "* "+ branch + "\u001B[0m")
   }
+
   /**
-   * Print the status states
-   * @param state : state : Changes to be committed ou not stage for commit
-   * @param subState : sub state : added, modified, deleted, untracked
+   * Print the status states.
+   * @param state : state (Changes to be committed or Not stage for commit)
+   * @param subState : sub state (added, modified, deleted, untracked)
    * @param files : file path list to print
    */
   def printStatus(state: String, subState: String, files: Seq[String]): Unit ={
@@ -57,7 +61,7 @@ object ConsolePrinter {
   }
 
   /**
-   * Print the commit infos.
+   * Print the commit info.
    * @param name : commit name
    * @param date : commit date
    * @param message : commit description

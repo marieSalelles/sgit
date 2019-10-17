@@ -1,4 +1,4 @@
-package sgit.branch
+package sgit.refsOperation
 
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import sgit.createRepo.InitCommand

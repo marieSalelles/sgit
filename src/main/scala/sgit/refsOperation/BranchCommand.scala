@@ -1,8 +1,7 @@
-package sgit.branch
+package sgit.refsOperation
 
-import sgit.io
 import sgit.io.{ConsolePrinter, CreateFile, ReadFile, SearchingTools, WriteFile}
-import sgit.objects.{Commit, StagedLine}
+import sgit.objects.Commit
 
 object BranchCommand {
 

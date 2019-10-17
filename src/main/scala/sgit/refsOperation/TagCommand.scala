@@ -1,4 +1,4 @@
-package sgit.branch
+package sgit.refsOperation
 
 import sgit.io.{ConsolePrinter, CreateFile, SearchingTools}
 

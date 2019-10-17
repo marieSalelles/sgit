@@ -1,4 +1,4 @@
-package sgit.branch
+package sgit.refsOperation
 
 import better.files._
 import org.scalatest.{BeforeAndAfter, FunSpec}
@@ -58,8 +58,8 @@ class CheckoutCommandTest extends FunSpec with BeforeAndAfter {
 
       CheckoutCommand.checkout("tagTest")
 
-      assert("test/READMEBIS.md".toFile.contentAsString.contains ("A line."))
-      assert(!"test/READMEBIS.md".toFile.contentAsString.contains ("It is a test line."))
+      assert("test/READMEBIS.md".toFile.contentAsString == "A line.")
+      assert("test/READMEBIS.md".toFile.contentAsString != "It is a test line.")
     }
     it("should change the current working directory with the version of the commit given in argument."){
       //commit the added files
@@ -73,8 +73,8 @@ class CheckoutCommandTest extends FunSpec with BeforeAndAfter {
 
       CheckoutCommand.checkout(firstCommit.get)
 
-      assert("test/READMEBIS.md".toFile.contentAsString.contains ("A line."))
-      assert(!"test/READMEBIS.md".toFile.contentAsString.contains ("It is a test line."))
+      assert("test/READMEBIS.md".toFile.contentAsString == "A line.")
+      assert("test/READMEBIS.md".toFile.contentAsString != "It is a test line.")
     }
   }
 }

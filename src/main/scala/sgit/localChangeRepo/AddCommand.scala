@@ -2,7 +2,7 @@ package sgit.localChangeRepo
 
 import better.files.File
 import sgit.io.{ConsolePrinter, CreateFile, ReadFile, RepoSearching, SearchingTools, WriteFile}
-import sgit.objects.{Blob, Commit, StagedLine}
+import sgit.objects.Blob
 
 import scala.util.matching.Regex
 
