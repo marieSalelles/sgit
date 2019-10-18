@@ -9,8 +9,8 @@ import scala.annotation.tailrec
 object DiffCommand {
 
   /**
-   * Allows the displaying of the difference between 2 version of the same file
-   * @return true if there are difference(s)
+   * Allows the displaying of the difference between 2 versions of the same file
+   * @return true if there are difference(s) between working directory and last commit
    */
   def diffBetweenCommitWD(): Boolean = {
     if(SearchingTools.searchSgitFolder()) {
@@ -71,8 +71,8 @@ object DiffCommand {
 
   /**
    * Order the lines from the first to the last in the file to print it in the asc order
-   * @param addedLine : added line
-   * @param deletedLine : deleted line
+   * @param addedLine : added lines
+   * @param deletedLine : deleted lines
    */
   @tailrec
   def printDiffLine(addedLine: Seq[(String, Int)], deletedLine: Seq[(String, Int)]): Unit = {

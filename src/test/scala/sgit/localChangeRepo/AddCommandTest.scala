@@ -1,7 +1,5 @@
 package sgit.localChangeRepo
 
-import java.nio.file.{Files, Paths}
-
 import better.files._
 import org.scalatest._
 import sgit.createRepo.InitCommand
@@ -29,54 +27,54 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
   }
 
   describe("If the user write the command sgit add <args> in the sgit repository."){
-    it("should correspond to the regex is/are added to the staged file.") {
+    it("should add files which correspond to the regex in the staged file.") {
         val regexarg = List("test/*.c")
         AddCommand.addAccordingTypeArg(regexarg)
         //search the file corresponding to the regex in the user repo
         val fileInUserRepo = RepoSearching.searchDirectoryFile("test/*.c")
         val files = fileInUserRepo.filterNot(f => f.isDirectory)
         //generate sha key to files
-        val shakeys = files.map(f => (f.sha1 + " " + ".sgit/".toFile.parent.relativize(f).toString))
-        //retrieve the sha key in the file staged
-        val contentFile = ".sgit/staged".toFile.contentAsString
+        val shakeysAndPath = files.map(f => (f.sha1 + " " + ".sgit/".toFile.parent.relativize(f).toString))
+        //retrieve the sha key and path in the staged file
+        val contentFile: List[String] = ".sgit/staged".toFile.contentAsString
           .replace("\r", "")
           .split("\n").toList
 
         assert(fileInUserRepo.map(f => f.name) == List("READMEBIS.c", "READMES.c"))
-        assert(contentFile == shakeys)
+        assert(contentFile == shakeysAndPath)
 
     }
-    it("should correspond to the name(s) given in by the user is/are added into the staged file."){
+    it("should add files which correspond to the name(s) given in by the user in the staged file."){
       val files :Seq[String] = Seq("test/READMES.c", "test/READMEBIS.c")
       AddCommand.addAccordingTypeArg(files)
 
-      //search the file corresponding to the regex in the user repo
-      val foundFile = RepoSearching.searchDirectoryFile(files)
+      //search the file corresponding to the names in the user repo
+      val foundFile: Seq[File] = RepoSearching.searchDirectoryFile(files)
+      val files2: Seq[File] = foundFile.filterNot(f => f.isDirectory)
       //generate sha key to files
-      val files2 = foundFile.filterNot(f => f.isDirectory)
-      val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
-      //retrieve the sha key in the file staged
-      val contentFile = ".sgit/staged".toFile.contentAsString
+      val shakeysAndPath: Seq[String] = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
+      //retrieve the sha key and path in the staged file
+      val contentFile: List[String] = ".sgit/staged".toFile.contentAsString
         .replace("\r", "")
         .split("\n").toList
 
       assert(foundFile.map(f => f.name) == List("READMES.c", "READMEBIS.c"))
-      assert(contentFile == shakeys)
+      assert(contentFile == shakeysAndPath)
     }
-    it(" should add all the files in the repository in the staged file.") {
+    it("should add all the files contain in the working directory in the staged file.") {
       val args :Seq[String] = Seq(".")
       AddCommand.addAccordingTypeArg(args)
 
       val files = RepoSearching.searchAllDirectoryFile(".sgit/")
+      val files2: Seq[File] = files.filterNot(f => f.isDirectory)
       //generate sha key to files
-      val files2 = files.filterNot(f => f.isDirectory)
-      val shakeys = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
-      //retrieve the sha key in the file staged
+      val shakeysAndPath: Seq[String] = files2.map(f => (f.sha1 +" "+ ".sgit/".toFile.parent.relativize(f).toString))
+      //retrieve the sha key and path in the staged file
       val contentFile = ".sgit/staged".toFile.contentAsString
         .replace("\r", "")
         .split("\n").toList
 
-      assert(contentFile == shakeys)
+      assert(contentFile == shakeysAndPath)
     }
   }
 }

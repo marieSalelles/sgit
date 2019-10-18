@@ -11,8 +11,8 @@ class InitCommandTest extends FunSpec with BeforeAndAfter {
   after {
     if(Files.exists(Paths.get(".sgit"))) ".sgit".toFile.delete()
   }
-  describe("If the user write the command sgit init in a directory") {
-    it("A folder with a tree view should be created in the directory.") {
+  describe("If the user writes the command sgit init in a directory") {
+    it(" should  create a folder with a tree view in the directory.") {
       InitCommand.createTreeView()
       assert(Files.exists(Paths.get(".sgit")))
       assert(Files.exists(Paths.get(".sgit/objects")))
@@ -22,7 +22,7 @@ class InitCommandTest extends FunSpec with BeforeAndAfter {
       assert(Files.exists(Paths.get((".sgit/refs/heads"))))
       assert(Files.exists(Paths.get(".sgit/refs/tags")))
     }
-    it("Or if the directory already exist, nothing is done.") {
+    it("sould do nothing if the directory already exist.") {
       CreateRepository.initialisation()
       assert (!CreateRepository.initialisation())
     }

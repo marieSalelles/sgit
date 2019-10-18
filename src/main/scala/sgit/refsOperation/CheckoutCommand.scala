@@ -9,7 +9,7 @@ object CheckoutCommand {
    * Change the current working directory for the files save with the given argument
    * @param identifier: branch name or tag name or commit sha key
    */
-  def checkout(identifier: String)= {
+  def checkout(identifier: String): Unit = {
     if (SearchingTools.searchSgitFolder()) {
       //search if it is a branch name
       val isLastCommit: Option[String] = SearchingTools.findLastCommit()
@@ -30,10 +30,11 @@ object CheckoutCommand {
           } else if (SearchingTools.searchTag(identifier)) {
             val commitSha: String = ReadFile.readTagCommit("refs/tags/" + identifier)
             val commitContent: Seq[StagedLine] = ReadFile.readCommitProperties(Some(commitSha)).get.files
-            //build the new working directory
             val commitBlobs: Seq[Blob] = ReadFile.readBlobFile(commitContent, Seq())
+            //build the new working directory
             commitBlobs.foreach(b => CreateRepository.builtRepository(b))
 
+            // search if it is commit sha key
           } else if (SearchingTools.searchCommit(identifier)) {
             val commitContent: Seq[StagedLine] = ReadFile.readCommitProperties(Some(identifier)).get.files
             val commitBlobs: Seq[Blob] = ReadFile.readBlobFile(commitContent, Seq())
@@ -43,6 +44,6 @@ object CheckoutCommand {
           } else ConsolePrinter.display("The argument is not a branch or a tag or a commit.")
         } else ConsolePrinter.display("Some files are added but not committed. Please do a commit before a checkout.")
       } else ConsolePrinter.display("Do at least one commit.")
-    }
+    } else ConsolePrinter.display("Do an sgit init.")
   }
 }

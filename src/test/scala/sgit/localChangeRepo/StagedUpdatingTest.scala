@@ -1,11 +1,9 @@
-package sgit.io
-
-import java.nio.file.{Files, Paths}
+package sgit.localChangeRepo
 
 import better.files._
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import sgit.createRepo.InitCommand
-import sgit.localChangeRepo.AddCommand
+import sgit.io.ReadFile
 import sgit.objects.StagedLine
 
 class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
@@ -29,7 +27,7 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
   }
 
   describe("If the user has already added files and try to re add files without commit (the staged file has a content)") {
-    describe("The files that the user would like to add are compared to the files in the staged.") {
+    describe("The files that the user would like to add are compared to the files in the staged file.") {
       it("should not add a file that is already in the staged file.") {
         val file = "READMEBIS.md"
         AddCommand.addAccordingTypeArg(List(file))
@@ -38,23 +36,27 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
         //add the same file
         AddCommand.addAccordingTypeArg(List(file))
         //read the staged file
-        val stagedContent = ReadFile.readStaged()
-        val stagedFile = stagedContent.get.map(f => f)
-        assert(stagedFile.head == expectedFileStaged)
+        val stagedContent: Option[Seq[StagedLine]] = ReadFile.readStaged()
+
+        assert(stagedContent.get.head == expectedFileStaged)
       }
       it("should delete the old version of a file in the staged file.") {
         val file = "READMEBIS.md"
         AddCommand.addAccordingTypeArg(List(file))
-        ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.appendLine("#It is a test.")
+        //modify the READMEBIS.md
+        ".sgit/".toFile.parent + "/" + file
+          .toFile
+          .appendLine("#It is a test.")
         //add the new version of the file
         AddCommand.addAccordingTypeArg(List(file))
         //compute the expected value
         val expectedFileStaged :StagedLine = StagedLine(file.toFile.sha1, ".sgit/".toFile.parent.relativize(file.toFile).toString)
         val stagedContent = ReadFile.readStaged()
         val stagedFile = stagedContent.get.map(f => f)
+
         assert(stagedFile.head == expectedFileStaged)
       }
-      it("should delete a file that is not in the user repo in the staged file."){
+      it("should delete a file that is not in the working directory but in the staged file."){
         val file = "READMEBIS.md"
         val file2 = "READMES.md"
         AddCommand.addAccordingTypeArg(List(file))
@@ -66,6 +68,7 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
         //read the current staged file
         val stagedContent = ReadFile.readStaged()
         val stagedFile = stagedContent.get.map(f => f)
+
         assert(stagedFile.head == expectedFileStaged)
       }
     }

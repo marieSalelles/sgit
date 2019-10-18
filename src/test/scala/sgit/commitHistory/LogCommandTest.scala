@@ -21,19 +21,17 @@ class LogCommandTest extends FunSpec with BeforeAndAfter {
   }
  after {
    if("READMES.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMES.md".toFile.delete()
-   if("READMEBIS.md".toFile.exists) {
-     ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
-   }
+   if("READMEBIS.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
    if(".sgit/".toFile.exists) ".sgit/".toFile.delete()
  }
 
   describe("If the user write the command sgit log in the sgit repository."){
-    it("should display all the commits created (the most recent to the oldest)"){
+    it("should display all the created commits (from the most recent to the oldest)"){
       //on one branch
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
       val firstCommit: Option[String] = CommitCommand.commit("First commit")
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
-      val secondCommit: Option[String] = CommitCommand.commit("First commit")
+      val secondCommit: Option[String] = CommitCommand.commit("Second commit")
       //last commit
       val lastCommit: Option[String] = SearchingTools.findLastCommit()
 

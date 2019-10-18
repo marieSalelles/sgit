@@ -29,15 +29,17 @@ class CommitCommandTest extends FunSpec with BeforeAndAfter {
       // add the file to the staged file
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
 
-      val commit = CommitCommand.commit("First commit")
+      val commit: Option[String] = CommitCommand.commit("First commit")
+
       assert(commit.isDefined)
       assert(".sgit/refs/heads/master".toFile.exists)
 
       val commitInHeads: String = ".sgit/refs/heads/master".toFile.contentAsString
+
       assert(commitInHeads == commit.get)
       assert(".sgit/staged".toFile.contentAsString.isEmpty)
     }
-    it("should crete a commit and modify the file in heads folder"){
+    it("should create a commit and modify the file in heads folder if it is not the first commit."){
       val repo :File = ".sgit/".toFile.parent
       val _: File = (repo + "/" + "READMES.md")
         .toFile
@@ -48,20 +50,20 @@ class CommitCommandTest extends FunSpec with BeforeAndAfter {
       // add the file to the staged file
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
       // create the first commit
-      val firstCommit = CommitCommand.commit("First commit")
+      val firstCommit: Option[String] = CommitCommand.commit("First commit")
       // add another file
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
       // create the second commit
-      val commit = CommitCommand.commit("Second commit")
+      val commit: Option[String] = CommitCommand.commit("Second commit")
 
       assert(commit.isDefined)
+
       // retrieve the value of the last created commit on the master branch
       val commitInHeads: String = ".sgit/refs/heads/master".toFile.contentAsString
       //retrieve the info of the second commit
       val secondCommitInfos: Option[Commit] = ReadFile.readCommitProperties(commit)
 
       assert(secondCommitInfos.get.parents.head == firstCommit.get)
-
       assert(commitInHeads == commit.get)
       assert(".sgit/staged".toFile.contentAsString.isEmpty)
     }

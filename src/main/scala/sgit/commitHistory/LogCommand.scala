@@ -26,7 +26,7 @@ object LogCommand {
    * Search the commit properties: commit sha key, commit message, commit date.
    * @param name: commit name (sha key)
    * @param commits : commit list
-   * @return the list of all created commit
+   * @return the list of all created commits
    */
     @tailrec
   def showCommitProperties(name: Option[String], commits: Seq[String]):Seq[String] = {

@@ -10,13 +10,14 @@ object AddCommand {
 
   /**
    * Check the argument type of add command and add the files to staged state.
-   * @param files : sequence of string which can be a dot, a regex or filenames
+   * @param files : sequence of string which can be a ., a regex or filenames
    */
   def addAccordingTypeArg(files :Seq[String]): Unit = {
     if(SearchingTools.searchSgitFolder()) {
       if (files.nonEmpty) {
+
         if (files.head == ".") {
-          //Search file in the user repo
+          //Search files in the working directory
           val retrieveFiles: Seq[File] = RepoSearching.searchAllDirectoryFile(".sgit/").filterNot(f => f.isDirectory)
           //Remove the files that are not modify
           val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
@@ -29,7 +30,7 @@ object AddCommand {
         else {
           val regexFilename: Regex = "^[a-zA-Z0-9_/]+\\.[A-Za-z]*$".r
           if (regexFilename.matches(files.head)) {
-            //Search file in the user repo
+            //Search file(s) in the working directory
             val retrievesFiles: Seq[File] = RepoSearching.searchDirectoryFile(files)
             //Remove the files that are not modify
             val filesToAdd = SearchingTools.findUnmodifyFiles(retrievesFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
@@ -39,7 +40,7 @@ object AddCommand {
             WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
             ConsolePrinter.display("Success, the files have been added.")
           } else {
-            //Search file in the user repo
+            //Search file(s) corresponding to the regex given in argument in the working directory
             val retrieveFiles: Seq[File] = RepoSearching.searchDirectoryFile(files.head)
             //Remove the files that are not modify
             val filesToAdd = SearchingTools.findUnmodifyFiles(retrieveFiles, ReadFile.readCommitProperties(SearchingTools.findLastCommit()))
@@ -47,7 +48,6 @@ object AddCommand {
             val blobs: Seq[Blob] = CreateFile.createObjectBlob(filesToAdd.filterNot(f => f.isDirectory))
             //write the staged file
             WriteFile.writeStaged(StagedUpdating.updateStagedFile(blobs))
-            //retrieveFiles.filter(f => f.isDirectory)
             ConsolePrinter.display("Success, the files have been added.")
           }
         }

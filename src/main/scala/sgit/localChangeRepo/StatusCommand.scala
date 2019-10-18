@@ -41,9 +41,9 @@ object StatusCommand {
 
           // add the untracked files and deleted files (they are not in the staged file)
           untrackedFiles(workingDirectory, stagedFile)
-          deleteFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory)
 
-          //staged files (added)
+          //modified files added to the staged file
           toBeCommitted(stagedFile.get, commitContent)
 
           //there are no files into the staged file (no files added) and there are modified files
@@ -53,27 +53,25 @@ object StatusCommand {
 
           // add the untracked files and deleted files (they are not in the staged file)
           untrackedFiles(workingDirectory, stagedFile)
-          deleteFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory)
 
           //there are no modified files but there are files into staged file (untracked files are added)
         } else if (modifiedFiles.isEmpty && stagedFile.nonEmpty) {
           untrackedFiles(workingDirectory, stagedFile)
-          deleteFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory)
           //staged files (added)
           ConsolePrinter.printStatus("\u001B[32m" +"Changes to be committed:"+"\u001B[0m", "\u001B[35m"+"Added "+"\u001B[0m", stagedFile.get.map(f => f.path))
 
-          //there are no modification and no files addd
+          //there are no modification and no added files
         } else if (modifiedFiles.isEmpty && stagedFile.isEmpty) {
           untrackedFiles(workingDirectory, stagedFile)
-          deleteFiles(workingDirectory, stagedFile)
+          deleteFiles(workingDirectory)
         }
       } else {
         //there is no commit created
-        //retrieve the untracked files
-        untrackedFiles(workingDirectory, stagedFile)
         //retrieve the staged files (added)
         if (stagedFile.nonEmpty) {
-          deleteFiles(workingDirectory, stagedFile)
+          untrackedFiles(workingDirectory, stagedFile)
           ConsolePrinter.printStatus("\u001B[32m"+"Changes to be committed:"+"\u001B[0m", "\u001B[35m"+"Added "+"\u001B[0m", stagedFile.get.map(f => f.path))
         }
       }
@@ -83,7 +81,7 @@ object StatusCommand {
   /**
    * Search and display the untracked files.
    * @param workingDirectory : working directory files
-   * @param stagedFile : staged files
+   * @param stagedFile : files into the staged file
    */
   def untrackedFiles(workingDirectory: Seq[File], stagedFile: Option[Seq[StagedLine]]): Unit= {
 
@@ -97,9 +95,8 @@ object StatusCommand {
   /**
    * Search and display the deleted file.
    * @param workingDirectory : working directory file
-   * @param stagedFile :staged files
    */
-  def deleteFiles(workingDirectory: Seq[File], stagedFile: Option[Seq[StagedLine]]): Unit = {
+  def deleteFiles(workingDirectory: Seq[File]): Unit = {
 
     //retrieve last commit
     val lastCommit: Option[String] = SearchingTools.findLastCommit()

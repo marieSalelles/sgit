@@ -14,7 +14,9 @@ object BranchCommand {
     if(SearchingTools.searchSgitFolder()) {
       if(name == "") {
         val allBranches: Seq[(String, String)] = SearchingTools.searchAllBranches()
+        //retrieve the current branch name
         val currentBranch: String = ReadFile.readHEAD().replace("\\", "/").split("/").last
+
         val otherBranches = allBranches.filterNot(b => b._1 == currentBranch)
         ConsolePrinter.displayCurrentBranch(currentBranch)
         ConsolePrinter.displayList(otherBranches.map(branch => branch._1))
@@ -46,7 +48,7 @@ object BranchCommand {
   }
 
   /**
-   * Display the list of all branch with their last commmit (commit sha and message)
+   * Display the list of all branches with their last commit (commit sha key and message)
    * @return the list of the branches with their commit infos
    */
   def VerboseBranch(): Option[Seq[String]] = {

@@ -17,17 +17,17 @@ object WriteFile {
 
   /**
    * Write in staged file
-   * @param fileSha : sequence of the object to add
+   * @param files : sequence of the files to add
    */
-  def writeStaged(fileSha :Seq[Blob]):Unit = {
-      fileSha.map(f => {
+  def writeStaged(files :Seq[Blob]):Unit = {
+      files.map(f => {
         ".sgit/staged".toFile.appendLine(f.sha+ " "+f.path)
       })
   }
 
   /**
    * Rewrite the staged file
-   * @param files : updated staged file
+   * @param files : the files to write
    */
   def rewriteStaged(files: Seq[StagedLine]) :Unit = {
     ".sgit/staged".toFile.overwrite("")
@@ -45,7 +45,7 @@ object WriteFile {
 
   /**
    * Transform the sequence of stagedLine in a string
-   * @param files : the staged lines of staged file
+   * @param files : the stagedLine of staged file
    * @param res : string
    * @return the string with all the files
    */

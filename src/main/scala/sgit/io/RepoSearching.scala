@@ -15,7 +15,6 @@ object RepoSearching {
 
     val files :Seq[File] = currentFolder.listRecursively.toSeq
     val filesWithoutSgit :Seq[File] = files.filterNot(f => f.path.toString.contains(".sgit"))
-    //val filesName :Seq[File]= filesWithoutSgit.map((f :File) => f)
     filesWithoutSgit
   }
 
@@ -26,10 +25,8 @@ object RepoSearching {
    */
   def searchDirectoryFile (regex :String):Seq[File] = {
     val currentFolder: File = ".".toFile
-    //val files :Seq[File] = currentFolder.listRecursively.filter(f => regex.matches(f.name)).toSeq
     val files :Seq[File] = currentFolder.glob(regex).toSeq
     val filesWithoutSgit = files.filterNot(f => f.path.toString.contains(".sgit"))
-    //val filesName = filesWithoutSgit.map((f :File) => f)
     filesWithoutSgit
   }
 

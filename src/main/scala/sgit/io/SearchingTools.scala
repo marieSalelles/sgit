@@ -9,7 +9,7 @@ object SearchingTools {
 
   /**
    * Search the .sgit folder
-   * @return true if the .sgit exists
+   * @return true if the .sgit folder exists
    */
   def searchSgitFolder(): Boolean ={
     ".sgit/".toFile.exists
@@ -34,7 +34,7 @@ object SearchingTools {
   }
 
   /**
-   * Retrieve all the branches with it name and last commit
+   * Retrieve all the branches with the name and last commit
    * @return a list of branch names and content (last commit on this branch)
    */
   def searchAllBranches(): Seq[(String, String)] = {
@@ -52,7 +52,7 @@ object SearchingTools {
   }
 
   /**
-   * Retrieve all the tags with it name and it commit
+   * Retrieve all the tags with the name and commit
    * @return a list of tag names and content (commit)
    */
   def searchAllTags(): Option[Seq[(String, String)]] = {
@@ -71,7 +71,7 @@ object SearchingTools {
   }
 
   /**
-   * Search the untracked files (it are not in the objects directory).
+   * Search the untracked files.
    * @param workingDirectory : the working directory folders and files
    * @return all the untracked files path
    */
@@ -79,17 +79,34 @@ object SearchingTools {
     val root = ".sgit/".toFile.parent
     //take all the files
     val wdFiles :Seq[File] = workingDirectory.filterNot(f=> f.isDirectory)
-    //search the file with sha not in objects folder
-    val untrackedFile: Seq[File] = wdFiles.filterNot(f => (".sgit/objects/"+ f.sha1).toFile.exists)
 
     if (stagedFile.nonEmpty) {
-      //retrieve path of file in staged
+      //retrieve file path in staged file
       val stagedPaths: Seq[String] = stagedFile.get.map(sf => sf.path)
-      //retrieve the untracked file which are not in the staged file
-      val untrackedFilePaths: Seq[File] = untrackedFile.filterNot(file => stagedPaths.contains(root.relativize(file).toString))
-      if (untrackedFilePaths.isEmpty) None else Some(untrackedFilePaths.map(f => root.relativize(f).toString))
-      // return the working directory if no added files
-    } else Some(untrackedFile.map(f => root.relativize(f).toString))
+      //retrieve the untracked files which are not in the staged file
+      val untrackedFilePaths: Seq[File] = wdFiles.filterNot(file => stagedPaths.contains(root.relativize(file).toString))
+      if (untrackedFilePaths.isEmpty) findFileNotInCommit(wdFiles) else findFileNotInCommit(untrackedFilePaths)
+    } else findFileNotInCommit(wdFiles)
+
+  }
+
+  /**
+   * Find the files which are not in the last commit
+   * @param files : file list
+   * @return the files which are not in the last commit (so the untracked files according to the last commit)
+   */
+  def findFileNotInCommit(files: Seq[File]): Option[Seq[String]] = {
+    val root = ".sgit/".toFile.parent
+    //search if the last commit knows the files
+    val lastCommit: Option[String] = findLastCommit()
+
+    if (lastCommit.isDefined) {
+      //commit content
+      val fileCommit: Seq[String] = ReadFile.readCommit(lastCommit.get).map(f => f.path)
+      val fileNotInCommit: Seq[File] = files.filterNot(file => fileCommit.contains(root.relativize(file).toString))
+      if (fileNotInCommit.isEmpty) None else Some(fileNotInCommit.map(f => root.relativize(f).toString))
+    } else Some(files.map(f => root.relativize(f).toString))
+
   }
 
   /**
@@ -110,10 +127,10 @@ object SearchingTools {
   }
 
   /**
-   * Search the deleted file
+   * Search the deleted files
    * @param workingDirectory : the working directory folders and files
    * @param commit : the list of files contains in the last commit
-   * @return the deleted file path
+   * @return the deleted file path list
    */
   def searchDeletedFiles(workingDirectory: Seq[File], commit: Seq[StagedLine]): Option[Seq[String]] = {
     val commitContent: Seq[File] = commit.map(f => f.path.toFile)
@@ -127,11 +144,11 @@ object SearchingTools {
   }
 
   /**
-   * Search the modified file between the last commit and the working directory.
+   * Search the modified files between the last commit and the working directory.
    * files classify into stages : Changes to be committed added and modified and Not staged for commit modified.
    * @param workingDirectory : working directory files
    * @param commitContent : commit files
-   * @return the modified files (sha and path)
+   * @return the modified files (sha key and path)
    */
   def searchedModifiedFiles(workingDirectory: Seq[File], commitContent: Seq[StagedLine]): Option[Seq[StagedLine]] = {
     //take all the files
@@ -141,7 +158,7 @@ object SearchingTools {
     val commitFilesPath: Seq[String] = commitContent.map(f => f.path)
     //retrieve sha of commit files
     val commitFilesSha: Seq[String] = commitContent.map(f => f.sha)
-    //file with same path, return file in the working directory
+    //file with same path, return files in the working directory
     val fileSamePath: Seq[File] = wdFiles.filter( f => commitFilesPath.contains(root.relativize(f).toString))
     //modified files
     val modifiedFiles: Seq[StagedLine] = fileSamePath
@@ -166,8 +183,8 @@ object SearchingTools {
   /**
    * Search the different files between the working directory and the last commit.
    * @param workingDirectory : working directory files
-   * @param commitContent : lest commit files
-   * @return a sequence of tuple which contains the a blob of the last commit file and blobs of the working directory file for the same file
+   * @param commitContent : last commit files
+   * @return a sequence of tuple which contains the blobs of the last commit file and blobs of the working directory file for the same file
    */
   def searchDifferentFileBetweenWDCommit(workingDirectory: Seq[File], commitContent: Seq[StagedLine]): Option[Seq[(Blob, Blob)]] = {
     //take all the working directory files
@@ -201,12 +218,13 @@ object SearchingTools {
    * @return a tuple of blobs with in first the file contains in the commit and in second the file contains in the working directory
    */
   def retrieveFilesWDCommit(path: String, commitContent: Seq[StagedLine], wdFiles: Seq[File]): Option[(Blob,Blob)] = {
-    //retrive the file in the commit
+    //retrieve the file in the commit
     val sameFileCommit: Seq[StagedLine] = commitContent.filter(cf => cf.path == path)
 
     //retrieve the file in staged file
     val fileInStaged: Option[Seq[StagedLine]] = retrieveFileInStagedWithPath(path)
 
+    //if the file is in the staged file , return the file version contains in the staged file
     if(fileInStaged.isDefined && fileInStaged.get.nonEmpty){
       val root = ".sgit/".toFile.parent
 
@@ -214,7 +232,7 @@ object SearchingTools {
       val sameFileWD: Seq[File] = wdFiles.filter(wdf => root.relativize(wdf).toString == path)
 
       if(sameFileWD.nonEmpty){
-        //retrieve the content of the commit file version
+        //retrieve the content of the staged file version
         val contentStagedFile = ReadFile.readBlobContent(fileInStaged.get.head.sha)
         Some((Blob(fileInStaged.get.head.sha, contentStagedFile, fileInStaged.get.head.path),
           Blob(sameFileWD.head.sha1, sameFileWD.head.contentAsString, root.relativize(sameFileWD.head).toString)))
@@ -236,9 +254,9 @@ object SearchingTools {
   }
 
   /**
-   * Retrieve a file in staged if the file is in the index
+   * Retrieve a file in staged file if the file is in it
    * @param path file path
-   * @return the file in exists
+   * @return the file if exists
    */
   def retrieveFileInStagedWithPath(path: String): Option[Seq[StagedLine]]= {
     ///retrieve the staged file content

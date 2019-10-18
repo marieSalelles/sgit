@@ -19,7 +19,7 @@ object TagCommand {
         } else "There is no tags."
       } else if (!SearchingTools.searchTag(tagName)) {
         val commit: Option[String] = SearchingTools.findLastCommit()
-        //create a file in heads folder
+        //create a file in tags folder
         if (commit.isDefined) {
           //create the tag file
           CreateFile.writeTagsFile("refs/tags/"+ tagName, commit.get)

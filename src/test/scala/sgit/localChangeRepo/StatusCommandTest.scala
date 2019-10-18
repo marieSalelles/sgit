@@ -106,6 +106,10 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
 
         assert(modifiedFiles.get.length == 1)
         assert(modifiedFiles.get.map(f => f.path.replace("\\","/")).contains("test/READMES.md"))
+
+        //retrieve the modified files
+        val untrackedFiles: Option[Seq[String]] = SearchingTools.searchedUntrackedFiles(repo, stagedFile)
+        assert(untrackedFiles.isEmpty)
       }
     }
     it("should classify the files in \"to be committed Added\" if the file has been created and added after a commit with another files."){
