@@ -19,13 +19,14 @@ class TagCommandTest extends FunSpec with BeforeAndAfter{
     if("READMEBIS.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
     if(".sgit/".toFile.exists) ".sgit/".toFile.delete()
   }
-  describe("If the user write the command sgit tag in the sgit repository.") {
+  describe("If the user writes the command sgit tag in the sgit repository.") {
     it("should create a file in the tags folder and put the last commit in it.") {
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
       CommitCommand.commit("First commit")
       TagCommand.newTag("test")
 
       assert(".sgit/refs/tags/test".toFile.exists)
+
       val referencedCommit: String = ".sgit/refs/tags/test".toFile.contentAsString
       val lastCommit: Option[String] = SearchingTools.findLastCommit()
 
@@ -37,6 +38,7 @@ class TagCommandTest extends FunSpec with BeforeAndAfter{
       TagCommand.newTag("test")
 
       val sameNewTag = TagCommand.newTag("test")
+
       assert(sameNewTag == "The tag already exists.")
     }
     it("should display all the tags if the user doesn't put an argument."){

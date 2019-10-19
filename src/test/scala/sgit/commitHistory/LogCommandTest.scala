@@ -25,7 +25,7 @@ class LogCommandTest extends FunSpec with BeforeAndAfter {
    if(".sgit/".toFile.exists) ".sgit/".toFile.delete()
  }
 
-  describe("If the user write the command sgit log in the sgit repository."){
+  describe("If the user writes the command sgit log in the sgit repository."){
     it("should display all the created commits (from the most recent to the oldest)"){
       //on one branch
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))

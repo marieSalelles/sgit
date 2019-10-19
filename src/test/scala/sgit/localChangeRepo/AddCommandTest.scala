@@ -9,9 +9,9 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
   before {
     InitCommand.createTreeView()
     val repo :File = ".sgit/".toFile.parent
-    val folder: File = ("test/")
+    val _: File = "test/"
       .toFile
-      .createIfNotExists(true,false)
+      .createIfNotExists(asDirectory = true,createParents = false)
     val _: File=  (repo + "/" + "test/READMES.c")
       .toFile
       .createIfNotExists()
@@ -26,7 +26,7 @@ class AddCommandTest extends FunSpec with BeforeAndAfter {
     if("READMEBIS.c".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.c".toFile.delete()
   }
 
-  describe("If the user write the command sgit add <args> in the sgit repository."){
+  describe("If the user writes the command sgit add <args> in the sgit repository."){
     it("should add files which correspond to the regex in the staged file.") {
         val regexarg = List("test/*.c")
         AddCommand.addAccordingTypeArg(regexarg)

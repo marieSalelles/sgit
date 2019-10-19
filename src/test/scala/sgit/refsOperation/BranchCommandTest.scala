@@ -3,7 +3,7 @@ package sgit.refsOperation
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import sgit.createRepo.InitCommand
 import better.files._
-import sgit.io.{ReadFile, SearchingTools}
+import sgit.io.SearchingTools
 import sgit.localChangeRepo.{AddCommand, CommitCommand}
 
 class BranchCommandTest extends FunSpec with BeforeAndAfter {
@@ -18,10 +18,10 @@ class BranchCommandTest extends FunSpec with BeforeAndAfter {
     if("READMEBIS.md".toFile.exists) ".sgit/".toFile.parent + "/" + "READMEBIS.md".toFile.delete()
     if(".sgit/".toFile.exists) ".sgit/".toFile.delete()
   }
-  describe("If the user write the command sgit branch in the sgit repository.") {
+  describe("If the user writes the command sgit branch in the sgit repository.") {
     it("should create a file in the heads folder and put the last commit in it.") {
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
-      val commit= CommitCommand.commit("First commit")
+      CommitCommand.commit("First commit")
       BranchCommand.newBranch("test")
 
       assert(".sgit/refs/heads/test".toFile.exists)
@@ -51,7 +51,7 @@ class BranchCommandTest extends FunSpec with BeforeAndAfter {
 
       assert(newBranch == "Do a commit before create a new branch.")
     }
-    it("should do list all the branches and their commit infos if the user put the -av option after the branch command.") {
+    it("should do a list of all the branches and their commit info if the user puts the -v option after the branch command.") {
       AddCommand.addAccordingTypeArg(Seq("READMEBIS.md"))
       val commitKey: Option[String] = CommitCommand.commit("First commit")
 

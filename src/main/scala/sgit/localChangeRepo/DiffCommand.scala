@@ -30,8 +30,10 @@ object DiffCommand {
             //check if the content of the file is not the same in the 2 versions.
             if(f._1.content != f._2.content) {
               ConsolePrinter.display(f._1.path)
-              showDifferences(f._1.content.replace("\r","").split("\n"),
+              val modifiedLines:(List[(String, Int)],List[(String, Int)]) = showDifferences(f._1.content.replace("\r","").split("\n"),
                 f._2.content.replace("\r","").split("\n"))
+              //print the line according to their position in the file
+              printDiffLine(modifiedLines._1, modifiedLines._2)
             }
           })
           true
@@ -55,18 +57,18 @@ object DiffCommand {
    * @param wdFileContent : content of the file in its current version.
    * @return a tuple with the deleted line and the added line in the file.
    */
-  def showDifferences(commitFileContent: Array[String], wdFileContent: Array[String] ):(List[String], List[String]) = {
+  def showDifferences(commitFileContent: Array[String], wdFileContent: Array[String] ):(List[(String, Int)], List[(String, Int)]) = {
     //line with the index of the it
     val commitContent = commitFileContent.filterNot(dl => dl =="").toList.zipWithIndex
     val wdContent = wdFileContent.filterNot(dl => dl =="").toList.zipWithIndex
+    val wdContentPath = wdContent.map(f => f._1)
+    val commitContentPath = commitContent.map(f => f._1)
     //search deleted lines
-    val deletedLine: List[(String,Int)] = commitContent.diff(wdContent).distinct
+    val deletedLine:List[(String, Int)] = commitContent.map( f => if (wdContentPath.contains(f._1)) null else f).filterNot(f => f == null)
     //search added lines
-    val addedLine: List[(String,Int)] = wdContent.diff(commitContent).distinct
-    //print the line according to their position in the file
-    printDiffLine(addedLine, deletedLine)
+   val addedLine:List[(String, Int)] = wdContent.map( f => if (commitContentPath.contains(f._1)) null else f).filterNot(f => f == null)
 
-    (deletedLine.map(l => l._1), addedLine.map(l=>l._1))
+    (deletedLine, addedLine)
   }
 
   /**
@@ -75,20 +77,20 @@ object DiffCommand {
    * @param deletedLine : deleted lines
    */
   @tailrec
-  def printDiffLine(addedLine: Seq[(String, Int)], deletedLine: Seq[(String, Int)]): Unit = {
+  def printDiffLine(deletedLine: Seq[(String, Int)], addedLine: Seq[(String, Int)]): Unit = {
     if (deletedLine.nonEmpty || addedLine.nonEmpty){
       if (addedLine.isEmpty){
         ConsolePrinter.displayRed(deletedLine.head._2.toString, deletedLine.head._1)
-        printDiffLine(Seq(), deletedLine.tail)
+        printDiffLine( deletedLine.tail, Seq())
       } else if (deletedLine.isEmpty){
         ConsolePrinter.displayGreen(addedLine.head._2.toString ,addedLine.head._1)
-        printDiffLine(addedLine.tail,Seq())
+        printDiffLine(Seq(), addedLine.tail)
       } else if (deletedLine.head._2 <= addedLine.head._2){
         ConsolePrinter.displayRed(deletedLine.head._2.toString, deletedLine.head._1)
-        printDiffLine(addedLine, deletedLine.tail)
+        printDiffLine(deletedLine.tail, addedLine)
       } else if(deletedLine.head._2 > addedLine.head._2) {
         ConsolePrinter.displayGreen(addedLine.head._2.toString, addedLine.head._1)
-        printDiffLine(addedLine.tail, deletedLine)
+        printDiffLine(deletedLine, addedLine.tail)
       }
     }
   }

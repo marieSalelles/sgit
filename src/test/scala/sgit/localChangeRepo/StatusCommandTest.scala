@@ -9,22 +9,22 @@ import sgit.objects.StagedLine
 class StatusCommandTest extends FunSpec with BeforeAndAfter{
   before{
     InitCommand.createTreeView()
-    val folder: File = ("test/")
+    val folder: File = "test/"
       .toFile
-      .createIfNotExists(true,false)
-    val _: File=  ("test/READMES.md")
+      .createIfNotExists(asDirectory = true,createParents = false)
+    val _: File=  "test/READMES.md"
       .toFile
-      .createIfNotExists(false, true)
-    val _: File=  ("test/READMEBIS.md")
+      .createIfNotExists(asDirectory = false, createParents = true)
+    val _: File=  "test/READMEBIS.md"
       .toFile
-      .createIfNotExists(false, true)
+      .createIfNotExists(asDirectory = false, createParents = true)
   }
   after{
     if(".sgit/".toFile.exists) ".sgit".toFile.delete()
     if("test/".toFile.exists) "test".toFile.delete()
   }
-  describe("If the user write the command sgit status in the sgit repository."){
-    it("should classify all the files in untracked files when there is no commit and add command create."){
+  describe("If the user writes the command sgit status in the sgit repository."){
+    it("should classify all the files in untracked files when there is no commit and add commands create."){
       val repo:Seq[File] = RepoSearching.searchAllDirectoryFile("test/READMES.md")
       val stagedContent :Option[Seq[StagedLine]] = ReadFile.readStaged()
       if(stagedContent.isDefined) {
@@ -34,29 +34,27 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
         assert(untracked.equals(Seq("READMES.md","READMEBIS.md")))
       }
     }
-    it("should classify the files in \"changes to be committed Added\" if the user add the files when there is no commit."){
+    it("should classify the files in \"changes to be committed Added\" if the user adds the files when there is no commit."){
       val repo:Seq[File] = RepoSearching.searchAllDirectoryFile("test/READMES.md")
       AddCommand.addAccordingTypeArg(Seq("READMES.md"))
-
+      //retrieve stagds file content
+      val stagedContent :Option[Seq[StagedLine]] = ReadFile.readStaged()
       //retrieve last commit
       val lastCommit: Option[String] = SearchingTools.findLastCommit()
       //if the last commit exists
-      if (lastCommit.isDefined) {
-        //content of last commit
-        val commitContent = ReadFile.readCommit(lastCommit.get)
-        val modifiedFiles: Option[Seq[StagedLine]] = SearchingTools.searchedModifiedFiles(repo, commitContent)
+      if (!lastCommit.isDefined && stagedContent.isDefined) {
 
-        assert(modifiedFiles.get.length == 1)
-        assert(modifiedFiles.get.map(f => f.path) == Seq("READMES.md"))
+        assert(stagedContent.get.length == 1)
+        assert(stagedContent.get.map(f => f.path) == Seq("READMES.md"))
       }
     }
-    it("should classify the files in \"to be committed Modified\" if the file has been modified and added after the commit."){
+    it("should classify the files in \"to be committed Modified\" if the files have been modified and added after the commit."){
       val repo:Seq[File] = RepoSearching.searchAllDirectoryFile("test/READMES.md")
       AddCommand.addAccordingTypeArg(Seq("test/READMES.md","test/READMEBIS.md"))
       //commit the added files
       CommitCommand.commit("My first commit")
       //modify a file
-      val _: File=  ("test/READMES.md")
+      val _: File=  "test/READMES.md"
         .toFile
         .appendLine("test")
 
@@ -76,7 +74,7 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
 
         assert(modifiedFiles.get.length == 1)
         assert(modifiedFiles.get.map(f => f.path.replace("\\","/")).contains("test/READMES.md"))
-       // assert(newFileCommitted.isEmpty)
+        assert(newFileCommitted.isEmpty)
       }
     }
     it("should classify the files in \"not staged for commit Modified\" if the file has been modified after the commit."){
@@ -85,7 +83,7 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
       //commit the added files
       CommitCommand.commit("My first commit")
       //modify a file
-      val _: File=  ("test/READMES.md")
+      val _: File=  "test/READMES.md"
         .toFile
         .appendLine("test")
 
@@ -105,20 +103,19 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
         }
 
         assert(modifiedFiles.get.length == 1)
-        assert(modifiedFiles.get.map(f => f.path.replace("\\","/")).contains("test/READMES.md"))
 
         //retrieve the modified files
         val untrackedFiles: Option[Seq[String]] = SearchingTools.searchedUntrackedFiles(repo, stagedFile)
+
         assert(untrackedFiles.isEmpty)
       }
     }
     it("should classify the files in \"to be committed Added\" if the file has been created and added after a commit with another files."){
-      val repo:Seq[File] = RepoSearching.searchAllDirectoryFile("test/READMES.md")
       AddCommand.addAccordingTypeArg(Seq("test/READMES.md","test/READMEBIS.md"))
       //commit the added files
       CommitCommand.commit("My first commit")
       //create and add a new file
-      val _: File=  ("test/TEST.md").toFile.createFile()
+      val _: File=  "test/TEST.md".toFile.createFile()
 
       //search the files in the repo
       val newRepo:Seq[File] = RepoSearching.searchAllDirectoryFile("READMES.md")
@@ -134,6 +131,11 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
         val modifiedFiles: Option[Seq[StagedLine]] = SearchingTools.searchedModifiedFiles(newRepo, commitContent)
 
         assert(modifiedFiles.isEmpty)
+
+        val stagedFile :Option[Seq[StagedLine]]= ReadFile.readStaged()
+        val newFileCommitted= SearchingTools.toBeCommittedFileAdded(stagedFile.get,commitContent)
+
+        assert(newFileCommitted.get.length == 1)
       }
     }
     it("should classify the files in \"to be committed Added\" if the file has been created and added with other files after a commit with another files."){
@@ -141,9 +143,9 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
       AddCommand.addAccordingTypeArg(Seq("test/READMES.md","test/READMEBIS.md"))
       CommitCommand.commit("My first commit")
       //create and add a new file
-      val _: File=  ("test/TEST.md").toFile.createFile().append("test2")
+      val _: File=  "test/TEST.md".toFile.createFile().append("test2")
       //modify a file
-      val _: File=  ("test/READMES.md").toFile.appendLine("test")
+      val _: File=  "test/READMES.md".toFile.appendLine("test")
       AddCommand.addAccordingTypeArg(Seq("test/TEST.md","test/READMES.md"))
 
       //last commit
@@ -170,7 +172,7 @@ class StatusCommandTest extends FunSpec with BeforeAndAfter{
       //commit the added files
       CommitCommand.commit("My first commit")
       //delete the file
-      ("test/READMES.md").toFile.delete()
+      "test/READMES.md".toFile.delete()
       val repo:Seq[File] = RepoSearching.searchAllDirectoryFile("test/READMES.md")
       //last commit
       val lastCommit: Option[String] = SearchingTools.findLastCommit()

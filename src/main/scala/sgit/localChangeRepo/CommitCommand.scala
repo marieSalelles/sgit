@@ -22,15 +22,12 @@ object CommitCommand {
       else {
         val filesToWrite: Seq[StagedLine] = stagedFiles.get
         if (lastCommit.isDefined) {
-          val filesPath = filesToWrite.map(f => f.path)
           //retrieve the content of the last commit
           val lastCommitContent: Seq[StagedLine] = ReadFile.readCommit(lastCommit.get)
+
           //create the content of the new commit, replace the old version of file in last commit with the new version
-          val newContent: Seq[StagedLine] = lastCommitContent.map(f => {
-            if (filesPath.contains(f.path)) {
-              filesToWrite.filter(file => file.path == f.path).head
-            } else f
-          })
+          val newContent: Seq[StagedLine] = createContentNewCommit(lastCommitContent, filesToWrite)
+
           //create the commit file with the newContent, the untracked file(s) in the last commit and the old ones
           val newCommit: String = CreateFile.createCommit((lastCommit.get, ""), newContent.concat(filesToWrite).distinct, message)
           // write the new commit on the current branch file
@@ -54,6 +51,23 @@ object CommitCommand {
       ConsolePrinter.display("Do an sgit init.")
       None
     }
+  }
+
+  /**
+   * Create the content of the new commit: replace the old version of file(s) in last commit with the new ones contains in staged file.
+   * @param lastCommitContent : last commit content
+   * @param stagedFileContent:  staged file content
+   * @return the content of the new commit
+   */
+  def createContentNewCommit (lastCommitContent: Seq[StagedLine], stagedFileContent: Seq[StagedLine] ): Seq[StagedLine]= {
+    //list of file paths contains in the staged file
+    val filesPath: Seq[String] = stagedFileContent.map(f => f.path)
+
+    lastCommitContent.map(f => {
+      if (filesPath.contains(f.path)) {
+        stagedFileContent.filter(file => file.path == f.path).head
+      } else f
+    })
   }
 
 }

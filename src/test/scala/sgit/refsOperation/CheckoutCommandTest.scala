@@ -9,16 +9,16 @@ import sgit.localChangeRepo.{AddCommand, CommitCommand}
 class CheckoutCommandTest extends FunSpec with BeforeAndAfter {
   before {
     InitCommand.createTreeView()
-    val repo :File = ".sgit/".toFile.parent
-    val folder: File = ("test/")
+    val  _:File = ".sgit/".toFile.parent
+    val _: File = "test/"
       .toFile
-      .createIfNotExists(true,false)
-    val _: File=  ("test/READMES.md")
+      .createIfNotExists(asDirectory = true,createParents = false)
+    val _: File= "test/READMES.md"
       .toFile
-      .createIfNotExists(false, true)
-    val _: File=  ("test/READMEBIS.md")
+      .createIfNotExists(asDirectory = false, createParents = true)
+    val _: File=  "test/READMEBIS.md"
       .toFile
-      .createIfNotExists(false, true)
+      .createIfNotExists(asDirectory = false, createParents = true)
         .append("A line.")
     AddCommand.addAccordingTypeArg(Seq("test/READMEBIS.md","test/READMES.md"))
   }
@@ -27,8 +27,8 @@ class CheckoutCommandTest extends FunSpec with BeforeAndAfter {
     if("test/".toFile.exists) "test".toFile.delete()
   }
 
-  describe("If the user write the command sgit checkout in the sgit repository.") {
-    it("should change the current working directory with the version store in the branch name given in argument."){
+  describe("If the user writes the command sgit checkout in the sgit repository.") {
+    it("should change the current working directory with the version stores in the branch name given in argument."){
       //commit the added files
       CommitCommand.commit("My first commit.")
       //create a branch
@@ -45,7 +45,7 @@ class CheckoutCommandTest extends FunSpec with BeforeAndAfter {
       assert("test/READMEBIS.md".toFile.exists)
       assert(ReadFile.readHEAD() == "refs/heads/master")
     }
-    it("should change the current working directory with the version store by the tag name given in argument."){
+    it("should change the current working directory with the version stores by the tag name given in argument."){
       //commit the added files
       CommitCommand.commit("My first commit.")
       //create a tag

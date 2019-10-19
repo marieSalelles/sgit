@@ -42,6 +42,8 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
       }
       it("should delete the old version of a file in the staged file.") {
         val file = "READMEBIS.md"
+        val oldShaKey = file.toFile.sha1
+
         AddCommand.addAccordingTypeArg(List(file))
         //modify the READMEBIS.md
         ".sgit/".toFile.parent + "/" + file
@@ -54,6 +56,7 @@ class StagedUpdatingTest extends FunSpec with BeforeAndAfter{
         val stagedContent = ReadFile.readStaged()
         val stagedFile = stagedContent.get.map(f => f)
 
+        assert(expectedFileStaged.sha != oldShaKey)
         assert(stagedFile.head == expectedFileStaged)
       }
       it("should delete a file that is not in the working directory but in the staged file."){
