@@ -39,9 +39,9 @@ object Main extends App {
       case "branch" => determineOpt(option, "branch", Some(branch))
       case "tag" => TagCommand.newTag(tag)
       case "checkout" => CheckoutCommand.checkout(checkout)
-      case "merge" => println("merge")
-      case "rebase" => println("rebase")
-      case _=> println("Error, write a good command!")
+      case "merge" => println("Unimplemented functionality.")
+      case "rebase" => println("Unimplemented functionality.")
+      case _=> println("Error, write a valid command!")
     }
   }
 
@@ -55,8 +55,8 @@ object Main extends App {
     if (command == "log") {
       opt match {
         case ""=> LogCommand.log()
-        case "stat" => println("log stat")
-        case "p" => println("log p")
+        case "stat" => println("Unimplemented functionality.")
+        case "p" => println("Unimplemented functionality.")
       }
     }
     else if (command =="branch") {
