@@ -219,8 +219,10 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
         assert(differentFile.get.length == 2)
         assert((differentFile.get.head._1.path == root.relativize("READMEBIS.md".toFile).toString) || (differentFile.get.last._1.path == root.relativize("READMEBIS.md".toFile).toString))
         assert((differentFile.get.last._1.path == root.relativize("READMES.md".toFile).toString) || (differentFile.get.head._1.path == root.relativize("READMES.md".toFile).toString))
+        //retrieve the READMES file
+        val firstFile: (Blob, Blob) = differentFile.get.filter(b => b._1.path.contains("READMES")).head
 
-        val differentLine: (List[(String,Int)], List[(String,Int)]) = DiffCommand.showDifferences(differentFile.get.last._1.content.split("\n"), differentFile.get.last._2.content.split("\n"))
+        val differentLine: (List[(String,Int)], List[(String,Int)]) = DiffCommand.showDifferences(firstFile._1.content.split("\n"), firstFile._2.content.split("\n"))
 
         assert(differentLine._2.length == 1)
         assert(differentLine._2.head._1.contains("Test to add line."))
