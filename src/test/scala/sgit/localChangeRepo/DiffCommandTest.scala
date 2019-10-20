@@ -217,7 +217,7 @@ class DiffCommandTest extends FunSpec with BeforeAndAfter {
         val differentFile: Option[Seq[(Blob, Blob)]] = SearchingTools.searchDifferentFileBetweenWDCommit(workingDirectory, commitContent)
 
         assert(differentFile.get.length == 2)
-        assert((differentFile.get.head._1.path == root.relativize("READMEBIS.md".toFile).toString) || (differentFile.get.last._1.path == root.relativize("READMES.md".toFile).toString))
+        assert((differentFile.get.head._1.path == root.relativize("READMEBIS.md".toFile).toString) || (differentFile.get.last._1.path == root.relativize("READMEBIS.md".toFile).toString))
         assert((differentFile.get.last._1.path == root.relativize("READMES.md".toFile).toString) || (differentFile.get.head._1.path == root.relativize("READMES.md".toFile).toString))
 
         val differentLine: (List[(String,Int)], List[(String,Int)]) = DiffCommand.showDifferences(differentFile.get.last._1.content.split("\n"), differentFile.get.last._2.content.split("\n"))
